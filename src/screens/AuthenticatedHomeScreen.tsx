@@ -1,18 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { clearAuthSession } from '../services/authStorage';
 import { logout } from '../services/firebase';
+import GroupListScreen from './GroupListScreen';
+import AcceptInviteScreen from './AcceptInviteScreen';
 
 type AuthenticatedHomeScreenProps = {
   onLogout: () => void;
 };
 
 const AuthenticatedHomeScreen = ({ onLogout }: AuthenticatedHomeScreenProps) => {
+  const [showGroups, setShowGroups] = useState(false);
+  const [showAcceptInvite, setShowAcceptInvite] = useState(false);
+
   const handleLogout = async () => {
     await logout();
     await clearAuthSession();
     onLogout();
   };
+
+  if (showGroups) {
+    return <GroupListScreen onLogout={handleLogout} onBack={() => setShowGroups(false)} />;
+  }
+
+  if (showAcceptInvite) {
+    return <AcceptInviteScreen onBack={() => setShowAcceptInvite(false)} />;
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -20,7 +33,15 @@ const AuthenticatedHomeScreen = ({ onLogout }: AuthenticatedHomeScreenProps) => 
         <Text testID="homeTitle" style={styles.title}>Bem-vindo ao JogaMuito</Text>
         <Text style={styles.subtitle}>Sua conta foi autenticada com sucesso.</Text>
 
-        <Pressable style={styles.button} onPress={handleLogout}>
+        <Pressable testID="viewGroupsButton" style={styles.primaryButton} onPress={() => setShowGroups(true)}>
+          <Text style={styles.buttonText}>Ver grupos</Text>
+        </Pressable>
+
+        <Pressable testID="acceptInviteButton" style={styles.secondaryButton} onPress={() => setShowAcceptInvite(true)}>
+          <Text style={styles.buttonText}>Aceitar convite</Text>
+        </Pressable>
+
+        <Pressable style={styles.tertiaryButton} onPress={handleLogout}>
           <Text style={styles.buttonText}>Sair</Text>
         </Pressable>
       </View>
@@ -52,7 +73,21 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     textAlign: 'center',
   },
-  button: {
+  primaryButton: {
+    backgroundColor: '#2563eb',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    marginBottom: 12,
+  },
+  secondaryButton: {
+    backgroundColor: '#10b981',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    marginBottom: 12,
+  },
+  tertiaryButton: {
     backgroundColor: '#dc2626',
     borderRadius: 12,
     paddingVertical: 14,

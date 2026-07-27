@@ -75,6 +75,7 @@ const RegisterScreen = ({ onRegistered, onSwitchToLogin }: RegisterScreenProps) 
           <Text style={styles.subtitle}>Cadastre-se para usar o JogaMuito.</Text>
 
           <TextInput
+            testID="registerNameInput"
             style={styles.input}
             placeholder="Nome"
             placeholderTextColor="#94a3b8"
@@ -83,6 +84,7 @@ const RegisterScreen = ({ onRegistered, onSwitchToLogin }: RegisterScreenProps) 
           />
 
           <TextInput
+            testID="registerEmailInput"
             style={styles.input}
             placeholder="Email"
             placeholderTextColor="#94a3b8"
@@ -93,6 +95,7 @@ const RegisterScreen = ({ onRegistered, onSwitchToLogin }: RegisterScreenProps) 
           />
 
           <TextInput
+            testID="registerPasswordInput"
             style={styles.input}
             placeholder="Senha"
             placeholderTextColor="#94a3b8"
@@ -102,6 +105,7 @@ const RegisterScreen = ({ onRegistered, onSwitchToLogin }: RegisterScreenProps) 
           />
 
           <TextInput
+            testID="registerConfirmPasswordInput"
             style={styles.input}
             placeholder="Confirmar senha"
             placeholderTextColor="#94a3b8"
@@ -110,7 +114,7 @@ const RegisterScreen = ({ onRegistered, onSwitchToLogin }: RegisterScreenProps) 
             secureTextEntry
           />
 
-          <Pressable style={styles.button} onPress={handleRegister} disabled={loading}>
+          <Pressable testID="registerButton" style={styles.button} onPress={handleRegister} disabled={loading}>
             <Text style={styles.buttonText}>{loading ? 'Cadastrando...' : 'Cadastrar'}</Text>
           </Pressable>
 

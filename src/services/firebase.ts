@@ -1,4 +1,5 @@
 import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -28,6 +29,7 @@ if (!getApps().length) {
 }
 
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
 export const facebookProvider = new FacebookAuthProvider();
 export const appleProvider = new OAuthProvider('apple.com');
