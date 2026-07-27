@@ -1,0 +1,9 @@
+{
+  "testEnvironment": "node",
+  "testRunner": "jest-circus/runner",
+  "testTimeout": 120000,
+  "setupFilesAfterEnv": ["<rootDir>/setupTests.ts"],
+  "transform": {
+    "^.+\\.(js|ts|tsx)$": "babel-jest"
+  }
+}
