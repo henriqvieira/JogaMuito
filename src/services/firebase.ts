@@ -12,12 +12,12 @@ import {
 } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyDUMMY-API-KEY',
-  authDomain: 'jogamuito.firebaseapp.com',
-  projectId: 'jogamuito',
-  storageBucket: 'jogamuito.appspot.com',
-  messagingSenderId: '000000000000',
-  appId: '1:000000000000:web:abc123',
+  apiKey: 'AIzaSyDCVtLTn6nksIZCi0muz5Qbtgm_lZ4TXkI',
+  authDomain: 'jogamuito-def71.firebaseapp.com',
+  projectId: 'jogamuito-def71',
+  storageBucket: 'jogamuito-def71.firebasestorage.app',
+  messagingSenderId: '380674096547',
+  appId: '1:380674096547:android:18792cd8e4efa587ebae16',
 };
 
 let app: FirebaseApp;
@@ -48,4 +48,38 @@ export const signInWithSocialCredential = async (credential: any) => {
 
 export const logout = async () => {
   return signOut(auth);
+};
+
+export const logFirebaseError = (context: string, error: any) => {
+  const payload = {
+    context,
+    code: error?.code,
+    message: error?.message,
+    name: error?.name,
+  };
+
+  console.error('[FirebaseError]', payload);
+};
+
+export const getFirebaseAuthErrorMessage = (error: any) => {
+  const code = error?.code as string | undefined;
+
+  switch (code) {
+    case 'auth/configuration-not-found':
+      return 'Configuracao de autenticacao nao encontrada. No Firebase Console, ative Authentication > Sign-in method > Email/Password e confira se a config web do Firebase esta correta no app.';
+    case 'auth/email-already-in-use':
+      return 'Este email ja esta em uso.';
+    case 'auth/invalid-email':
+      return 'Email invalido.';
+    case 'auth/weak-password':
+      return 'Senha fraca. Use pelo menos 6 caracteres.';
+    case 'auth/operation-not-allowed':
+      return 'Cadastro por email/senha nao habilitado no Firebase.';
+    case 'auth/network-request-failed':
+      return 'Falha de rede. Verifique sua conexao e tente novamente.';
+    case 'auth/too-many-requests':
+      return 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
+    default:
+      return error?.message || 'Nao foi possivel criar a conta.';
+  }
 };
