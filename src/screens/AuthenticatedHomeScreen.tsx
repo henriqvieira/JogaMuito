@@ -4,6 +4,8 @@ import { clearAuthSession } from '../services/authStorage';
 import { logout } from '../services/firebase';
 import GroupListScreen from './GroupListScreen';
 import AcceptInviteScreen from './AcceptInviteScreen';
+import CreateGameEventScreen from './CreateGameEventScreen';
+import RecordGoalsScreen from './RecordGoalsScreen';
 
 type AuthenticatedHomeScreenProps = {
   onLogout: () => void;
@@ -12,6 +14,8 @@ type AuthenticatedHomeScreenProps = {
 const AuthenticatedHomeScreen = ({ onLogout }: AuthenticatedHomeScreenProps) => {
   const [showGroups, setShowGroups] = useState(false);
   const [showAcceptInvite, setShowAcceptInvite] = useState(false);
+  const [showCreateEvent, setShowCreateEvent] = useState(false);
+  const [showRecordGoals, setShowRecordGoals] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -27,6 +31,14 @@ const AuthenticatedHomeScreen = ({ onLogout }: AuthenticatedHomeScreenProps) => 
     return <AcceptInviteScreen onBack={() => setShowAcceptInvite(false)} />;
   }
 
+  if (showCreateEvent) {
+    return <CreateGameEventScreen onBack={() => setShowCreateEvent(false)} />;
+  }
+
+  if (showRecordGoals) {
+    return <RecordGoalsScreen onBack={() => setShowRecordGoals(false)} />;
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -39,6 +51,14 @@ const AuthenticatedHomeScreen = ({ onLogout }: AuthenticatedHomeScreenProps) => 
 
         <Pressable testID="acceptInviteButton" style={styles.secondaryButton} onPress={() => setShowAcceptInvite(true)}>
           <Text style={styles.buttonText}>Aceitar convite</Text>
+        </Pressable>
+
+        <Pressable testID="createGameEventButton" style={styles.eventButton} onPress={() => setShowCreateEvent(true)}>
+          <Text style={styles.buttonText}>Criar evento de jogo</Text>
+        </Pressable>
+
+        <Pressable testID="recordGoalsButton" style={styles.goalsButton} onPress={() => setShowRecordGoals(true)}>
+          <Text style={styles.buttonText}>Registrar gols</Text>
         </Pressable>
 
         <Pressable style={styles.tertiaryButton} onPress={handleLogout}>
@@ -82,6 +102,20 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     backgroundColor: '#10b981',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    marginBottom: 12,
+  },
+  eventButton: {
+    backgroundColor: '#0284c7',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    marginBottom: 12,
+  },
+  goalsButton: {
+    backgroundColor: '#16a34a',
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 24,
