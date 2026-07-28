@@ -51,3 +51,6 @@ Thumbs.db
 coverage/
 jest-cache/
 
+# Dumps locais de depuracao
+window_dump.xml
+
