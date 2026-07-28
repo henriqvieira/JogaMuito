@@ -11,6 +11,7 @@
     "detox:test": "detox test --configuration android.emu.debug --cleanup",
     "detox:test:events": "detox test --configuration android.emu.debug --cleanup e2e/events.e2e.ts",
     "detox:test:finance": "detox test --configuration android.emu.debug --cleanup e2e/finance.e2e.ts",
+    "detox:test:reports": "detox test --configuration android.emu.debug --cleanup e2e/reports.e2e.ts",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "format": "prettier --write ."
