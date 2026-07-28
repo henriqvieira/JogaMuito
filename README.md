@@ -172,6 +172,106 @@ Variaveis de ambiente esperadas no teste:
 - `E2E_PASSWORD`
 - `E2E_GROUP_ID` (grupo onde o usuario de teste seja admin)
 
+## Teste E2E do fluxo financeiro (Detox)
+
+Foi adicionado um fluxo E2E completo em `e2e/finance.e2e.ts` cobrindo:
+- criar custo da partida com valor total
+- dividir automaticamente entre jogadores
+- aplicar isencao para um jogador
+- abrir historico financeiro e validar relatorio por grupo
+
+Para executar apenas esse fluxo:
+
+```bash
+npm run detox:test:finance
+```
+
+Variaveis de ambiente esperadas no teste:
+- `E2E_EMAIL`
+- `E2E_PASSWORD`
+- `E2E_GROUP_ID` (grupo onde o usuario de teste seja admin)
+
+## Modulo financeiro
+
+O modulo financeiro permite:
+- registrar o valor total de uma partida
+- dividir automaticamente entre jogadores
+- aplicar isencao por jogador
+- confirmar pagamento total ou parcial por jogador
+- consultar historico financeiro agregado por grupo
+
+### Colecoes Firebase usadas para financas
+
+- `matchCosts`
+  - colecao principal de custos por partida
+  - cada documento representa um registro financeiro de uma partida
+  - campos:
+    - `groupId`: string (grupo dono do registro)
+    - `eventId`: string | null (evento relacionado, opcional)
+    - `totalAmount`: number (valor total da partida)
+    - `amountPerPlayer`: number (valor calculado por jogador pagante)
+    - `chargeablePlayers`: number (quantidade de pagantes)
+    - `exemptPlayers`: number (quantidade de isentos)
+    - `breakdown`: array de objetos por jogador
+      - `name`: string
+      - `isExempt`: boolean
+      - `amount`: number (valor devido por aquele jogador)
+      - `paidAmount`: number opcional (valor ja pago, usado na confirmacao de pagamento)
+    - `createdBy`: string (uid do usuario que criou)
+    - `createdAt`: timestamp
+    - `updatedAt`: timestamp (quando houver edicao ou confirmacao de pagamento)
+
+- `groups`
+  - usada para validacao de permissao administrativa antes de qualquer escrita financeira
+  - campo usado no modulo:
+    - `admins`: string[]
+
+### Validacao de permissao antes de salvar
+
+Antes de salvar, editar, aplicar isencao ou confirmar pagamento, o app valida:
+1. usuario autenticado
+2. grupo existente
+3. usuario presente em `groups/{groupId}.admins`
+
+Se a validacao falhar, a operacao e bloqueada com erro de permissao.
+
+### Operacoes de dados (servico financeiro)
+
+As operacoes ficam em `src/services/matchCostService.ts`:
+
+- `calculateMatchCostSummary`
+  - calcula divisao automatica e aplica isencoes
+
+- `saveMatchCost`
+  - cria um novo documento em `matchCosts`
+  - valida permissao de admin antes da escrita
+
+- `updateMatchCost`
+  - atualiza valor total e redistribui custos/isenções em um registro existente
+  - valida permissao de admin antes da escrita
+
+- `confirmMatchCostPayment`
+  - atualiza `breakdown[].paidAmount` para marcar pagamento de jogador
+  - valida permissao de admin antes da escrita
+
+- `getMatchCostsByGroup`
+  - consulta `matchCosts` por `groupId`
+  - ordena por `createdAt` decrescente
+
+- `getGroupFinancialHistory`
+  - agrega dados por jogador
+  - retorna totais pagos, devidos e acumulados por grupo
+
+### Consultas Firestore usadas no modulo financeiro
+
+- Escritas:
+  - `addDoc(matchCosts, ...)`
+  - `runTransaction` para atualizacoes de custo e confirmacao de pagamento
+
+- Leituras:
+  - `getDoc(groups/{groupId})` para validar admin
+  - `query(matchCosts, where('groupId', '==', groupId), orderBy('createdAt', 'desc'))`
+
 ## Estrutura principal
 
 - src/components: componentes reutilizáveis

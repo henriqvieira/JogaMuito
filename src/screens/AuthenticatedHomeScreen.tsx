@@ -6,6 +6,8 @@ import GroupListScreen from './GroupListScreen';
 import AcceptInviteScreen from './AcceptInviteScreen';
 import CreateGameEventScreen from './CreateGameEventScreen';
 import RecordGoalsScreen from './RecordGoalsScreen';
+import ManageMatchCostScreen from './ManageMatchCostScreen';
+import FinancialHistoryScreen from './FinancialHistoryScreen';
 
 type AuthenticatedHomeScreenProps = {
   onLogout: () => void;
@@ -16,6 +18,8 @@ const AuthenticatedHomeScreen = ({ onLogout }: AuthenticatedHomeScreenProps) => 
   const [showAcceptInvite, setShowAcceptInvite] = useState(false);
   const [showCreateEvent, setShowCreateEvent] = useState(false);
   const [showRecordGoals, setShowRecordGoals] = useState(false);
+  const [showManageCosts, setShowManageCosts] = useState(false);
+  const [showFinancialHistory, setShowFinancialHistory] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -39,6 +43,14 @@ const AuthenticatedHomeScreen = ({ onLogout }: AuthenticatedHomeScreenProps) => 
     return <RecordGoalsScreen onBack={() => setShowRecordGoals(false)} />;
   }
 
+  if (showManageCosts) {
+    return <ManageMatchCostScreen onBack={() => setShowManageCosts(false)} />;
+  }
+
+  if (showFinancialHistory) {
+    return <FinancialHistoryScreen onBack={() => setShowFinancialHistory(false)} />;
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -59,6 +71,18 @@ const AuthenticatedHomeScreen = ({ onLogout }: AuthenticatedHomeScreenProps) => 
 
         <Pressable testID="recordGoalsButton" style={styles.goalsButton} onPress={() => setShowRecordGoals(true)}>
           <Text style={styles.buttonText}>Registrar gols</Text>
+        </Pressable>
+
+        <Pressable testID="manageMatchCostsButton" style={styles.costsButton} onPress={() => setShowManageCosts(true)}>
+          <Text style={styles.buttonText}>Gerenciar custos</Text>
+        </Pressable>
+
+        <Pressable
+          testID="financialHistoryButton"
+          style={styles.historyButton}
+          onPress={() => setShowFinancialHistory(true)}
+        >
+          <Text style={styles.buttonText}>Historico financeiro</Text>
         </Pressable>
 
         <Pressable style={styles.tertiaryButton} onPress={handleLogout}>
@@ -116,6 +140,20 @@ const styles = StyleSheet.create({
   },
   goalsButton: {
     backgroundColor: '#16a34a',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    marginBottom: 12,
+  },
+  costsButton: {
+    backgroundColor: '#0f766e',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    marginBottom: 12,
+  },
+  historyButton: {
+    backgroundColor: '#7c3aed',
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 24,
