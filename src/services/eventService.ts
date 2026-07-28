@@ -8,6 +8,7 @@ import {
   orderBy,
   query,
   runTransaction,
+  setDoc,
   serverTimestamp,
   Timestamp,
   where,
@@ -57,6 +58,29 @@ export type GameEvent = {
   result: MatchResult;
   createdBy: string;
   createdAt?: Timestamp | null;
+};
+
+export type GroupPlayerMatchStats = {
+  playerName: string;
+  matches: number;
+  wins: number;
+  losses: number;
+  goals: number;
+};
+
+export type GroupMatchReport = {
+  groupId: string;
+  totalMatches: number;
+  totalGoals: number;
+  players: GroupPlayerMatchStats[];
+};
+
+export type ManualPlayerStatsInput = {
+  playerName: string;
+  matches: number;
+  wins: number;
+  losses: number;
+  goals: number;
 };
 
 const eventsCollection = collection(db, 'gameEvents');
@@ -226,6 +250,267 @@ export const getLatestGameEventByGroup = async (groupId: string) => {
 
   const latestEvent = snapshot.docs[0];
   return getGameEventById(latestEvent.id);
+};
+
+const ensurePlayerStats = (
+  playerMap: Record<string, GroupPlayerMatchStats>,
+  playerName: string,
+) => {
+  const normalizedName = playerName.trim();
+  if (!normalizedName) {
+    return null;
+  }
+
+  if (!playerMap[normalizedName]) {
+    playerMap[normalizedName] = {
+      playerName: normalizedName,
+      matches: 0,
+      wins: 0,
+      losses: 0,
+      goals: 0,
+    };
+  }
+
+  return playerMap[normalizedName];
+};
+
+export const getGroupMatchReport = async (groupId: string): Promise<GroupMatchReport> => {
+  const normalizedGroupId = groupId.trim();
+  if (!normalizedGroupId) {
+    throw new Error('ID do grupo e obrigatorio para consultar relatorio de partidas.');
+  }
+
+  const eventsQuery = query(eventsCollection, where('groupId', '==', normalizedGroupId));
+  const snapshot = await getDocs(eventsQuery);
+
+  const playerMap: Record<string, GroupPlayerMatchStats> = {};
+  let totalGoals = 0;
+
+  snapshot.docs.forEach(docSnapshot => {
+    const data = docSnapshot.data();
+
+    const teamA = (data.lineup?.teamA ?? []) as string[];
+    const teamB = (data.lineup?.teamB ?? []) as string[];
+
+    const teamAPlayers = Array.from(new Set(teamA.map(player => player.trim()).filter(Boolean)));
+    const teamBPlayers = Array.from(new Set(teamB.map(player => player.trim()).filter(Boolean)));
+
+    const winner = (data.result?.winner ?? 'draw') as TeamId | 'draw';
+
+    teamAPlayers.forEach(playerName => {
+      const stats = ensurePlayerStats(playerMap, playerName);
+      if (!stats) {
+        return;
+      }
+
+      stats.matches += 1;
+      if (winner === 'A') {
+        stats.wins += 1;
+      } else if (winner === 'B') {
+        stats.losses += 1;
+      }
+    });
+
+    teamBPlayers.forEach(playerName => {
+      const stats = ensurePlayerStats(playerMap, playerName);
+      if (!stats) {
+        return;
+      }
+
+      stats.matches += 1;
+      if (winner === 'B') {
+        stats.wins += 1;
+      } else if (winner === 'A') {
+        stats.losses += 1;
+      }
+    });
+
+    const goals = (data.goals ?? []) as GoalRecord[];
+    goals.forEach(goal => {
+      const stats = ensurePlayerStats(playerMap, goal.player ?? '');
+      if (!stats) {
+        return;
+      }
+
+      stats.goals += 1;
+      totalGoals += 1;
+    });
+  });
+
+  const players = Object.values(playerMap).sort((a, b) => {
+    if (b.goals !== a.goals) {
+      return b.goals - a.goals;
+    }
+
+    if (b.wins !== a.wins) {
+      return b.wins - a.wins;
+    }
+
+    return a.playerName.localeCompare(b.playerName);
+  });
+
+  return {
+    groupId: normalizedGroupId,
+    totalMatches: snapshot.size,
+    totalGoals,
+    players,
+  };
+};
+
+export const saveGroupMatchReport = async (groupId: string): Promise<GroupMatchReport> => {
+  const normalizedGroupId = groupId.trim();
+  if (!normalizedGroupId) {
+    throw new Error('ID do grupo e obrigatorio para salvar relatorio de partidas.');
+  }
+
+  await assertUserIsGroupAdmin(normalizedGroupId);
+
+  const report = await getGroupMatchReport(normalizedGroupId);
+  const reportRef = doc(db, 'groupMatchReports', normalizedGroupId);
+
+  await setDoc(reportRef, {
+    ...report,
+    updatedAt: serverTimestamp(),
+  });
+
+  return report;
+};
+
+export const isCurrentUserGroupAdmin = async (groupId: string): Promise<boolean> => {
+  const normalizedGroupId = groupId.trim();
+  if (!normalizedGroupId) {
+    return false;
+  }
+
+  const userId = auth.currentUser?.uid;
+  if (!userId) {
+    return false;
+  }
+
+  const groupRef = doc(groupsCollection, normalizedGroupId);
+  const groupSnapshot = await getDoc(groupRef);
+  if (!groupSnapshot.exists()) {
+    return false;
+  }
+
+  const admins = (groupSnapshot.data().admins ?? []) as string[];
+  return admins.includes(userId);
+};
+
+const normalizeManualPlayerStats = (players: ManualPlayerStatsInput[]) => {
+  const normalizedPlayers = players
+    .map(player => ({
+      playerName: player.playerName.trim(),
+      matches: Math.max(0, Number(player.matches) || 0),
+      wins: Math.max(0, Number(player.wins) || 0),
+      losses: Math.max(0, Number(player.losses) || 0),
+      goals: Math.max(0, Number(player.goals) || 0),
+    }))
+    .filter(player => player.playerName.length > 0);
+
+  normalizedPlayers.forEach(player => {
+    if (player.matches === 0) {
+      throw new Error(`Jogador sem jogos nao pode ser salvo: ${player.playerName}.`);
+    }
+
+    if (player.wins + player.losses > player.matches) {
+      throw new Error(`Estatisticas invalidas para ${player.playerName}: vitorias + derrotas excedem jogos.`);
+    }
+  });
+
+  const uniqueNames = new Set(normalizedPlayers.map(player => player.playerName.toLowerCase()));
+  if (uniqueNames.size !== normalizedPlayers.length) {
+    throw new Error('Nao e permitido salvar jogadores duplicados no relatorio.');
+  }
+
+  return normalizedPlayers;
+};
+
+export const updateGroupMatchReportManual = async (
+  groupId: string,
+  players: ManualPlayerStatsInput[],
+): Promise<GroupMatchReport> => {
+  const normalizedGroupId = groupId.trim();
+  if (!normalizedGroupId) {
+    throw new Error('ID do grupo e obrigatorio para editar estatisticas.');
+  }
+
+  await assertUserIsGroupAdmin(normalizedGroupId);
+
+  const normalizedPlayers = normalizeManualPlayerStats(players);
+  if (normalizedPlayers.length === 0) {
+    throw new Error('Adicione ao menos um jogador para salvar o relatorio manual.');
+  }
+
+  const totalGoals = normalizedPlayers.reduce((sum, player) => sum + player.goals, 0);
+  const totalMatches = normalizedPlayers.reduce((maxValue, player) => Math.max(maxValue, player.matches), 0);
+
+  const report: GroupMatchReport = {
+    groupId: normalizedGroupId,
+    totalMatches,
+    totalGoals,
+    players: normalizedPlayers.sort((a, b) => {
+      if (b.goals !== a.goals) {
+        return b.goals - a.goals;
+      }
+
+      if (b.wins !== a.wins) {
+        return b.wins - a.wins;
+      }
+
+      return a.playerName.localeCompare(b.playerName);
+    }),
+  };
+
+  const reportRef = doc(db, 'groupMatchReports', normalizedGroupId);
+  await setDoc(reportRef, {
+    ...report,
+    updatedAt: serverTimestamp(),
+  });
+
+  return report;
+};
+
+export const getSavedGroupMatchReport = async (groupId: string): Promise<GroupMatchReport> => {
+  const normalizedGroupId = groupId.trim();
+  if (!normalizedGroupId) {
+    throw new Error('ID do grupo e obrigatorio para consultar relatorio salvo.');
+  }
+
+  const reportRef = doc(db, 'groupMatchReports', normalizedGroupId);
+  const snapshot = await getDoc(reportRef);
+
+  if (!snapshot.exists()) {
+    throw new Error('Nao existe relatorio salvo para este grupo. Gere e salve primeiro.');
+  }
+
+  const data = snapshot.data();
+  const players = ((data.players ?? []) as GroupPlayerMatchStats[]).map(player => ({
+    playerName: player.playerName ?? '',
+    matches: Number(player.matches ?? 0),
+    wins: Number(player.wins ?? 0),
+    losses: Number(player.losses ?? 0),
+    goals: Number(player.goals ?? 0),
+  }));
+
+  players.sort((a, b) => {
+    if (b.goals !== a.goals) {
+      return b.goals - a.goals;
+    }
+
+    if (b.wins !== a.wins) {
+      return b.wins - a.wins;
+    }
+
+    return a.playerName.localeCompare(b.playerName);
+  });
+
+  return {
+    groupId: data.groupId ?? normalizedGroupId,
+    totalMatches: Number(data.totalMatches ?? 0),
+    totalGoals: Number(data.totalGoals ?? 0),
+    players,
+  };
 };
 
 export const updateEventLineup = async (eventId: string, lineup: { teamA: string[]; teamB: string[] }) => {

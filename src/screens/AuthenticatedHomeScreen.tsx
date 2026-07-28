@@ -8,6 +8,7 @@ import CreateGameEventScreen from './CreateGameEventScreen';
 import RecordGoalsScreen from './RecordGoalsScreen';
 import ManageMatchCostScreen from './ManageMatchCostScreen';
 import FinancialHistoryScreen from './FinancialHistoryScreen';
+import GroupMatchReportScreen from './GroupMatchReportScreen';
 
 type AuthenticatedHomeScreenProps = {
   onLogout: () => void;
@@ -20,6 +21,7 @@ const AuthenticatedHomeScreen = ({ onLogout }: AuthenticatedHomeScreenProps) => 
   const [showRecordGoals, setShowRecordGoals] = useState(false);
   const [showManageCosts, setShowManageCosts] = useState(false);
   const [showFinancialHistory, setShowFinancialHistory] = useState(false);
+  const [showMatchReport, setShowMatchReport] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -49,6 +51,10 @@ const AuthenticatedHomeScreen = ({ onLogout }: AuthenticatedHomeScreenProps) => 
 
   if (showFinancialHistory) {
     return <FinancialHistoryScreen onBack={() => setShowFinancialHistory(false)} />;
+  }
+
+  if (showMatchReport) {
+    return <GroupMatchReportScreen onBack={() => setShowMatchReport(false)} />;
   }
 
   return (
@@ -83,6 +89,14 @@ const AuthenticatedHomeScreen = ({ onLogout }: AuthenticatedHomeScreenProps) => 
           onPress={() => setShowFinancialHistory(true)}
         >
           <Text style={styles.buttonText}>Historico financeiro</Text>
+        </Pressable>
+
+        <Pressable
+          testID="groupMatchReportButton"
+          style={styles.matchReportButton}
+          onPress={() => setShowMatchReport(true)}
+        >
+          <Text style={styles.buttonText}>Estatisticas dos jogadores</Text>
         </Pressable>
 
         <Pressable style={styles.tertiaryButton} onPress={handleLogout}>
@@ -154,6 +168,13 @@ const styles = StyleSheet.create({
   },
   historyButton: {
     backgroundColor: '#7c3aed',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    marginBottom: 12,
+  },
+  matchReportButton: {
+    backgroundColor: '#1d4ed8',
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 24,

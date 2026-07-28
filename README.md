@@ -191,6 +191,121 @@ Variaveis de ambiente esperadas no teste:
 - `E2E_PASSWORD`
 - `E2E_GROUP_ID` (grupo onde o usuario de teste seja admin)
 
+## Relatorios e estatisticas
+
+O app possui um fluxo dedicado para gerar, salvar, consultar e compartilhar relatorios de partidas com estatisticas individuais por jogador.
+
+### O que o modulo cobre
+
+- gerar estatisticas por grupo a partir dos eventos de jogo
+- salvar snapshot de relatorio no Firestore
+- recuperar relatorio salvo para consulta posterior
+- editar estatisticas manualmente (somente admin)
+- exportar relatorio em texto e compartilhar via WhatsApp
+
+### Estatisticas calculadas
+
+Por grupo:
+- total de jogos
+- total de gols
+
+Por jogador:
+- jogos
+- gols
+- vitorias
+- derrotas
+
+### Permissoes
+
+- Usuarios comuns: podem visualizar e compartilhar relatorios.
+- Administradores do grupo: podem gerar/salvar relatorio e editar estatisticas manualmente.
+
+Antes de qualquer escrita em relatorios, o app valida se o usuario autenticado esta em `groups/{groupId}.admins`.
+
+### Colecoes Firebase usadas (Firestore)
+
+Nao ha endpoints REST neste modulo; o app utiliza leituras/escritas diretas em colecoes do Firestore via SDK.
+
+- `gameEvents`
+  - origem dos dados brutos para calculo das estatisticas
+  - campos relevantes:
+    - `groupId`: string
+    - `lineup.teamA`: string[]
+    - `lineup.teamB`: string[]
+    - `goals`: array (`player`, `team`, `minute`, `createdBy`, `createdAt`)
+    - `result.winner`: `A` | `B` | `draw`
+
+- `groupMatchReports`
+  - snapshot consolidado do relatorio por grupo
+  - ID do documento: `groupId`
+  - campos:
+    - `groupId`: string
+    - `totalMatches`: number
+    - `totalGoals`: number
+    - `players`: array de objetos
+      - `playerName`: string
+      - `matches`: number
+      - `wins`: number
+      - `losses`: number
+      - `goals`: number
+    - `updatedAt`: timestamp
+
+- `groups`
+  - validacao de permissao administrativa
+  - campo usado:
+    - `admins`: string[]
+
+### Operacoes de dados (servico)
+
+As operacoes do modulo estao em `src/services/eventService.ts`:
+
+- `getGroupMatchReport(groupId)`
+  - agrega dados da colecao `gameEvents`
+  - retorna estatisticas por grupo e por jogador
+
+- `saveGroupMatchReport(groupId)`
+  - gera estatisticas e salva em `groupMatchReports/{groupId}`
+  - exige permissao de admin
+
+- `getSavedGroupMatchReport(groupId)`
+  - recupera o snapshot salvo em `groupMatchReports/{groupId}`
+
+- `updateGroupMatchReportManual(groupId, players)`
+  - atualiza estatisticas manualmente no documento do grupo
+  - exige permissao de admin
+  - validacoes:
+    - jogador sem jogos (`matches = 0`) e bloqueado
+    - `wins + losses` nao pode exceder `matches`
+    - nomes duplicados de jogadores sao bloqueados
+
+### Compartilhamento de relatorio
+
+- Tela: `Relatorio de partidas` (botao `Exportar texto e compartilhar no WhatsApp`)
+- Biblioteca: `react-native-share`
+- Comportamento:
+  - gera texto consolidado (resumo + lista de jogadores)
+  - abre compartilhamento com `social: Share.Social.WHATSAPP`
+  - se o WhatsApp nao estiver instalado, o app exibe alerta amigavel
+
+### Teste E2E do fluxo de relatorios (Detox)
+
+Foi adicionado um fluxo em `e2e/reports.e2e.ts` cobrindo:
+- criar jogo
+- registrar gols
+- gerar estatisticas do grupo
+- acionar compartilhamento do relatorio via WhatsApp
+
+Para executar apenas esse fluxo:
+
+```bash
+npm run detox:test:reports
+```
+
+Variaveis de ambiente esperadas no teste:
+- `E2E_EMAIL`
+- `E2E_PASSWORD`
+- `E2E_GROUP_ID` (grupo onde o usuario de teste seja admin)
+
 ## Modulo financeiro
 
 O modulo financeiro permite:
