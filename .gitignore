@@ -23,6 +23,9 @@ pnpm-debug.log*
 *.log
 .tmp/
 .cache/
+android/.gradle-user-home/
+temp_jogamuito/
+temp_rn_init/
 
 # Ambiente e secrets
 .env

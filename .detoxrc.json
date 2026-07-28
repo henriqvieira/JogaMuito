@@ -3,11 +3,22 @@
   "runnerConfig": "e2e/config.json",
   "configurations": {
     "android.emu.debug": {
+      "device": "emulator",
+      "app": "app.android",
+      "build": "cd android && .\\gradlew.bat assembleDebug"
+    }
+  },
+  "apps": {
+    "app.android": {
+      "type": "android.apk",
+      "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk"
+    }
+  },
+  "devices": {
+    "emulator": {
       "type": "android.emulator",
-      "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk",
-      "build": "cd android && ./gradlew assembleDebug",
       "device": {
-        "avdName": "Pixel_3a_API_30_x86"
+        "avdName": "Medium_Phone"
       }
     }
   }
