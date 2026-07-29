@@ -1,6 +1,7 @@
 import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import {
+  AuthCredential,
   createUserWithEmailAndPassword,
   getAuth,
   GoogleAuthProvider,
@@ -10,14 +11,30 @@ import {
   signInWithCredential,
   signOut,
 } from 'firebase/auth';
+import {
+  FIREBASE_API_KEY,
+  FIREBASE_APP_ID,
+  FIREBASE_AUTH_DOMAIN,
+  FIREBASE_MESSAGING_SENDER_ID,
+  FIREBASE_PROJECT_ID,
+  FIREBASE_STORAGE_BUCKET,
+} from '@env';
+
+const requiredEnv = (value: string | undefined, name: string) => {
+  if (!value) {
+    throw new Error(`Missing required Firebase env var: ${name}`);
+  }
+
+  return value;
+};
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyDCVtLTn6nksIZCi0muz5Qbtgm_lZ4TXkI',
-  authDomain: 'jogamuito-def71.firebaseapp.com',
-  projectId: 'jogamuito-def71',
-  storageBucket: 'jogamuito-def71.firebasestorage.app',
-  messagingSenderId: '380674096547',
-  appId: '1:380674096547:android:18792cd8e4efa587ebae16',
+  apiKey: requiredEnv(FIREBASE_API_KEY, 'FIREBASE_API_KEY'),
+  authDomain: requiredEnv(FIREBASE_AUTH_DOMAIN, 'FIREBASE_AUTH_DOMAIN'),
+  projectId: requiredEnv(FIREBASE_PROJECT_ID, 'FIREBASE_PROJECT_ID'),
+  storageBucket: requiredEnv(FIREBASE_STORAGE_BUCKET, 'FIREBASE_STORAGE_BUCKET'),
+  messagingSenderId: requiredEnv(FIREBASE_MESSAGING_SENDER_ID, 'FIREBASE_MESSAGING_SENDER_ID'),
+  appId: requiredEnv(FIREBASE_APP_ID, 'FIREBASE_APP_ID'),
 };
 
 let app: FirebaseApp;
@@ -42,7 +59,7 @@ export const registerWithEmailAndPassword = async (email: string, password: stri
   return createUserWithEmailAndPassword(auth, email, password);
 };
 
-export const signInWithSocialCredential = async (credential: any) => {
+export const signInWithSocialCredential = async (credential: AuthCredential) => {
   return signInWithCredential(auth, credential);
 };
 
@@ -50,19 +67,22 @@ export const logout = async () => {
   return signOut(auth);
 };
 
-export const logFirebaseError = (context: string, error: any) => {
+export const logFirebaseError = (context: string, error: unknown) => {
+  const typedError = error as { code?: string; message?: string; name?: string } | null;
+
   const payload = {
     context,
-    code: error?.code,
-    message: error?.message,
-    name: error?.name,
+    code: typedError?.code,
+    message: typedError?.message,
+    name: typedError?.name,
   };
 
   console.error('[FirebaseError]', payload);
 };
 
-export const getFirebaseAuthErrorMessage = (error: any) => {
-  const code = error?.code as string | undefined;
+export const getFirebaseAuthErrorMessage = (error: unknown) => {
+  const typedError = error as { code?: string; message?: string } | null;
+  const code = typedError?.code;
 
   switch (code) {
     case 'auth/configuration-not-found':
@@ -80,6 +100,6 @@ export const getFirebaseAuthErrorMessage = (error: any) => {
     case 'auth/too-many-requests':
       return 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
     default:
-      return error?.message || 'Nao foi possivel criar a conta.';
+      return typedError?.message || 'Nao foi possivel criar a conta.';
   }
 };

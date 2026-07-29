@@ -30,6 +30,7 @@ temp_rn_init/
 # Ambiente e secrets
 .env
 .env.*
+!.env.example
 *.keystore
 *.jks
 *.p12
