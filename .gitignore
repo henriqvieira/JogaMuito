@@ -30,6 +30,8 @@ temp_rn_init/
 # Ambiente e secrets
 .env
 .env.*
+!.env.example
+android/app/google-services.json
 *.keystore
 *.jks
 *.p12

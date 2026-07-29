@@ -16,13 +16,28 @@ cd apps/JogaMuito
 npm install
 ```
 
-3. Execute o Metro Bundler:
+3. Configure o arquivo local de ambiente:
+
+```bash
+copy .env.example .env
+```
+
+Preencha as chaves do Firebase no `.env` local antes de iniciar o app. As variáveis esperadas sao:
+
+- `FIREBASE_API_KEY`
+- `FIREBASE_AUTH_DOMAIN`
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_STORAGE_BUCKET`
+- `FIREBASE_MESSAGING_SENDER_ID`
+- `FIREBASE_APP_ID`
+
+4. Execute o Metro Bundler:
 
 ```bash
 npm start
 ```
 
-4. Em outro terminal, rode o app:
+5. Em outro terminal, rode o app:
 
 ```bash
 npx react-native run-android
@@ -91,11 +106,13 @@ O app JogaMuito permite criar grupos de jogo e compartilhar convites:
 O fluxo completo de eventos acontece apos o login e possui tres etapas principais:
 
 1. Criacao do evento
+
 - Tela: Criar evento de jogo
 - Campos obrigatorios: ID do grupo, data, horario, local, participantes
 - Apenas administradores do grupo podem salvar o evento
 
 2. Escalacao dos times
+
 - Ainda na criacao (ou edicao posterior), o administrador distribui participantes entre Time A e Time B
 - Regras de validacao:
   - ambos os times precisam ter ao menos um jogador
@@ -103,6 +120,7 @@ O fluxo completo de eventos acontece apos o login e possui tres etapas principai
   - todos os jogadores da escala precisam estar na lista de participantes
 
 3. Registro de gols e resultado final
+
 - Tela: Registrar gols
 - O admin registra gol informando jogador, time e minuto (opcional)
 - O resultado da partida e recalculado automaticamente a cada gol
@@ -112,6 +130,7 @@ O fluxo completo de eventos acontece apos o login e possui tres etapas principai
 Antes de qualquer escrita no Firestore, o app valida se o usuario autenticado esta em `groups/{groupId}.admins`.
 
 A validacao e aplicada em:
+
 - criacao de evento
 - edicao de escalacao
 - registro de gol
@@ -121,6 +140,7 @@ Se o usuario nao for admin, a operacao e bloqueada com erro de permissao.
 ### Colecoes Firebase usadas para eventos
 
 - `gameEvents`
+
   - colecao principal dos eventos
   - campos:
     - `groupId`: string
@@ -156,6 +176,7 @@ As operacoes de eventos ficam em `src/services/eventService.ts`:
 ## Teste E2E do fluxo de eventos (Detox)
 
 Foi adicionado um fluxo E2E completo em `e2e/events.e2e.ts` cobrindo:
+
 - criar jogo
 - escalar times
 - registrar gol
@@ -168,6 +189,7 @@ npm run detox:test:events
 ```
 
 Variaveis de ambiente esperadas no teste:
+
 - `E2E_EMAIL`
 - `E2E_PASSWORD`
 - `E2E_GROUP_ID` (grupo onde o usuario de teste seja admin)
@@ -175,6 +197,7 @@ Variaveis de ambiente esperadas no teste:
 ## Teste E2E do fluxo financeiro (Detox)
 
 Foi adicionado um fluxo E2E completo em `e2e/finance.e2e.ts` cobrindo:
+
 - criar custo da partida com valor total
 - dividir automaticamente entre jogadores
 - aplicar isencao para um jogador
@@ -187,6 +210,7 @@ npm run detox:test:finance
 ```
 
 Variaveis de ambiente esperadas no teste:
+
 - `E2E_EMAIL`
 - `E2E_PASSWORD`
 - `E2E_GROUP_ID` (grupo onde o usuario de teste seja admin)
@@ -206,10 +230,12 @@ O app possui um fluxo dedicado para gerar, salvar, consultar e compartilhar rela
 ### Estatisticas calculadas
 
 Por grupo:
+
 - total de jogos
 - total de gols
 
 Por jogador:
+
 - jogos
 - gols
 - vitorias
@@ -227,6 +253,7 @@ Antes de qualquer escrita em relatorios, o app valida se o usuario autenticado e
 Nao ha endpoints REST neste modulo; o app utiliza leituras/escritas diretas em colecoes do Firestore via SDK.
 
 - `gameEvents`
+
   - origem dos dados brutos para calculo das estatisticas
   - campos relevantes:
     - `groupId`: string
@@ -236,6 +263,7 @@ Nao ha endpoints REST neste modulo; o app utiliza leituras/escritas diretas em c
     - `result.winner`: `A` | `B` | `draw`
 
 - `groupMatchReports`
+
   - snapshot consolidado do relatorio por grupo
   - ID do documento: `groupId`
   - campos:
@@ -260,14 +288,17 @@ Nao ha endpoints REST neste modulo; o app utiliza leituras/escritas diretas em c
 As operacoes do modulo estao em `src/services/eventService.ts`:
 
 - `getGroupMatchReport(groupId)`
+
   - agrega dados da colecao `gameEvents`
   - retorna estatisticas por grupo e por jogador
 
 - `saveGroupMatchReport(groupId)`
+
   - gera estatisticas e salva em `groupMatchReports/{groupId}`
   - exige permissao de admin
 
 - `getSavedGroupMatchReport(groupId)`
+
   - recupera o snapshot salvo em `groupMatchReports/{groupId}`
 
 - `updateGroupMatchReportManual(groupId, players)`
@@ -290,6 +321,7 @@ As operacoes do modulo estao em `src/services/eventService.ts`:
 ### Teste E2E do fluxo de relatorios (Detox)
 
 Foi adicionado um fluxo em `e2e/reports.e2e.ts` cobrindo:
+
 - criar jogo
 - registrar gols
 - gerar estatisticas do grupo
@@ -302,6 +334,7 @@ npm run detox:test:reports
 ```
 
 Variaveis de ambiente esperadas no teste:
+
 - `E2E_EMAIL`
 - `E2E_PASSWORD`
 - `E2E_GROUP_ID` (grupo onde o usuario de teste seja admin)
@@ -309,6 +342,7 @@ Variaveis de ambiente esperadas no teste:
 ## Modulo financeiro
 
 O modulo financeiro permite:
+
 - registrar o valor total de uma partida
 - dividir automaticamente entre jogadores
 - aplicar isencao por jogador
@@ -318,6 +352,7 @@ O modulo financeiro permite:
 ### Colecoes Firebase usadas para financas
 
 - `matchCosts`
+
   - colecao principal de custos por partida
   - cada documento representa um registro financeiro de uma partida
   - campos:
@@ -344,6 +379,7 @@ O modulo financeiro permite:
 ### Validacao de permissao antes de salvar
 
 Antes de salvar, editar, aplicar isencao ou confirmar pagamento, o app valida:
+
 1. usuario autenticado
 2. grupo existente
 3. usuario presente em `groups/{groupId}.admins`
@@ -355,21 +391,26 @@ Se a validacao falhar, a operacao e bloqueada com erro de permissao.
 As operacoes ficam em `src/services/matchCostService.ts`:
 
 - `calculateMatchCostSummary`
+
   - calcula divisao automatica e aplica isencoes
 
 - `saveMatchCost`
+
   - cria um novo documento em `matchCosts`
   - valida permissao de admin antes da escrita
 
 - `updateMatchCost`
+
   - atualiza valor total e redistribui custos/isenções em um registro existente
   - valida permissao de admin antes da escrita
 
 - `confirmMatchCostPayment`
+
   - atualiza `breakdown[].paidAmount` para marcar pagamento de jogador
   - valida permissao de admin antes da escrita
 
 - `getMatchCostsByGroup`
+
   - consulta `matchCosts` por `groupId`
   - ordena por `createdAt` decrescente
 
@@ -380,6 +421,7 @@ As operacoes ficam em `src/services/matchCostService.ts`:
 ### Consultas Firestore usadas no modulo financeiro
 
 - Escritas:
+
   - `addDoc(matchCosts, ...)`
   - `runTransaction` para atualizacoes de custo e confirmacao de pagamento
 

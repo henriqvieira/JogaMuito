@@ -10,7 +10,11 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { registerWithEmailAndPassword } from '../services/firebase';
+import {
+  getFirebaseAuthErrorMessage,
+  logFirebaseError,
+  registerWithEmailAndPassword,
+} from '../services/firebase';
 
 type RegisterScreenProps = {
   onRegistered: () => void;
@@ -59,7 +63,8 @@ const RegisterScreen = ({ onRegistered, onSwitchToLogin }: RegisterScreenProps) 
       await registerWithEmailAndPassword(trimmedEmail, password);
       onRegistered();
     } catch (error: any) {
-      Alert.alert('Erro ao cadastrar', error?.message || 'Não foi possível criar a conta.');
+      logFirebaseError('registerWithEmailAndPassword', error);
+      Alert.alert('Erro ao cadastrar', getFirebaseAuthErrorMessage(error));
     } finally {
       setLoading(false);
     }
