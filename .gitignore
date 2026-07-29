@@ -31,6 +31,7 @@ temp_rn_init/
 .env
 .env.*
 !.env.example
+android/app/google-services.json
 *.keystore
 *.jks
 *.p12
