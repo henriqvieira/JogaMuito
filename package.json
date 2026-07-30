@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-native start",
+    "start": "node ./scripts/start-metro.js",
     "android": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-native run-android",
     "ios": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-native run-ios",
+    "start:metro": "node ./scripts/start-metro.js --reset-cache",
+    "android:debug": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-native run-android",
     "test": "jest",
     "detox:build": "detox build --configuration android.emu.debug",
     "detox:test": "detox test --configuration android.emu.debug --cleanup",
