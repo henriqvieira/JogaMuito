@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { theme } from '../design/theme';
 import { acceptInviteWithCode } from '../services/groupService';
 
 type AcceptInviteScreenProps = {
@@ -41,16 +42,18 @@ const AcceptInviteScreen = ({ onBack }: AcceptInviteScreenProps) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <View style={styles.header}>
-          <Pressable style={styles.backButton} onPress={onBack}>
-            <Text style={styles.backButtonText}>Voltar</Text>
-          </Pressable>
-          <Text style={styles.title}>Aceitar convite</Text>
-        </View>
+        <View style={styles.headerCard}>
+          <View style={styles.header}>
+            <Pressable style={styles.backButton} onPress={onBack}>
+              <Text style={styles.backButtonText}>Voltar</Text>
+            </Pressable>
+            <Text style={styles.title}>Aceitar convite</Text>
+          </View>
 
-        <Text style={styles.subtitle}>
-          Cole o link ou o código do convite para entrar no grupo.
-        </Text>
+          <Text style={styles.subtitle}>
+            Cole o link ou o código do convite para entrar no grupo.
+          </Text>
+        </View>
 
         <TextInput
           testID="inviteInput"
@@ -78,55 +81,61 @@ const AcceptInviteScreen = ({ onBack }: AcceptInviteScreenProps) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#eef2ff',
+    backgroundColor: theme.colors.background,
   },
   container: {
-    padding: 20,
-    paddingTop: 36,
+    padding: theme.spacing.lg,
+    paddingTop: theme.spacing.xl,
+  },
+  headerCard: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.lg,
+    ...theme.shadows.card,
+    marginBottom: theme.spacing.lg,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 18,
+    marginBottom: theme.spacing.sm,
   },
   backButton: {
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: '#e5e7eb',
-    borderRadius: 10,
-    marginRight: 12,
+    backgroundColor: theme.colors.surfaceAlt,
+    borderRadius: theme.radius.sm,
+    marginRight: theme.spacing.sm,
   },
   backButtonText: {
     fontSize: 14,
-    color: '#111827',
+    color: theme.colors.text,
     fontWeight: '600',
   },
   title: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: '700',
-    color: '#1f2937',
+    color: theme.colors.text,
   },
   subtitle: {
     fontSize: 15,
-    color: '#4b5563',
-    marginBottom: 20,
+    color: theme.colors.textMuted,
     lineHeight: 22,
   },
   input: {
-    backgroundColor: '#fff',
-    borderRadius: 14,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
     borderWidth: 1,
-    borderColor: '#d1d5db',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    borderColor: theme.colors.border,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
     fontSize: 15,
-    color: '#111827',
-    marginBottom: 16,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.md,
   },
   button: {
-    backgroundColor: '#2563eb',
-    borderRadius: 14,
-    paddingVertical: 16,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.radius.md,
+    paddingVertical: theme.spacing.md,
     justifyContent: 'center',
     alignItems: 'center',
   },

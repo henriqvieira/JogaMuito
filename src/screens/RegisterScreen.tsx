@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { theme } from '../design/theme';
 import {
   getFirebaseAuthErrorMessage,
   logFirebaseError,
@@ -76,14 +77,17 @@ const RegisterScreen = ({ onRegistered, onSwitchToLogin }: RegisterScreenProps) 
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={styles.card}>
-          <Text style={styles.title}>Criar conta</Text>
-          <Text style={styles.subtitle}>Cadastre-se para usar o JogaMuito.</Text>
+          <View style={styles.hero}>
+            <Text style={styles.eyebrow}>⚽ Novo no JogaMuito?</Text>
+            <Text style={styles.title}>Crie sua conta e monte seu time.</Text>
+            <Text style={styles.subtitle}>Cadastre-se para centralizar eventos, finanças e convites.</Text>
+          </View>
 
           <TextInput
             testID="registerNameInput"
             style={styles.input}
             placeholder="Nome"
-            placeholderTextColor="#94a3b8"
+            placeholderTextColor={theme.colors.textMuted}
             value={name}
             onChangeText={setName}
           />
@@ -92,7 +96,7 @@ const RegisterScreen = ({ onRegistered, onSwitchToLogin }: RegisterScreenProps) 
             testID="registerEmailInput"
             style={styles.input}
             placeholder="Email"
-            placeholderTextColor="#94a3b8"
+            placeholderTextColor={theme.colors.textMuted}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -103,7 +107,7 @@ const RegisterScreen = ({ onRegistered, onSwitchToLogin }: RegisterScreenProps) 
             testID="registerPasswordInput"
             style={styles.input}
             placeholder="Senha"
-            placeholderTextColor="#94a3b8"
+            placeholderTextColor={theme.colors.textMuted}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -113,7 +117,7 @@ const RegisterScreen = ({ onRegistered, onSwitchToLogin }: RegisterScreenProps) 
             testID="registerConfirmPasswordInput"
             style={styles.input}
             placeholder="Confirmar senha"
-            placeholderTextColor="#94a3b8"
+            placeholderTextColor={theme.colors.textMuted}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
@@ -135,62 +139,70 @@ const RegisterScreen = ({ onRegistered, onSwitchToLogin }: RegisterScreenProps) 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: theme.colors.background,
   },
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 24,
+    padding: theme.spacing.xl,
   },
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 4,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.xl,
+    ...theme.shadows.card,
+  },
+  hero: {
+    marginBottom: theme.spacing.md,
+    paddingBottom: theme.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  eyebrow: {
+    color: theme.colors.primaryDark,
+    fontWeight: '700',
+    marginBottom: theme.spacing.xs,
   },
   title: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: '700',
-    color: '#111827',
+    color: theme.colors.text,
     textAlign: 'center',
   },
   subtitle: {
-    marginTop: 8,
-    marginBottom: 20,
+    marginTop: theme.spacing.xs,
+    marginBottom: theme.spacing.sm,
     fontSize: 15,
-    color: '#6b7280',
+    color: theme.colors.textMuted,
     textAlign: 'center',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 12,
-    color: '#111827',
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.sm,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    marginBottom: theme.spacing.sm,
+    color: theme.colors.text,
+    backgroundColor: theme.colors.surfaceAlt,
   },
   button: {
-    backgroundColor: '#0f766e',
-    borderRadius: 12,
-    paddingVertical: 14,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.radius.sm,
+    paddingVertical: theme.spacing.sm,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: theme.spacing.xs,
   },
   buttonText: {
     color: '#ffffff',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   linkText: {
-    marginTop: 16,
-    color: '#0f766e',
+    marginTop: theme.spacing.md,
+    color: theme.colors.primaryDark,
     textAlign: 'center',
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });
 

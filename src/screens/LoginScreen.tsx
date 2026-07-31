@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import SocialAuthButtons from '../components/SocialAuthButtons';
+import { theme, heroGradient } from '../design/theme';
 import { loginWithEmailAndPassword } from '../services/firebase';
 
 type LoginScreenProps = {
@@ -71,14 +72,17 @@ const LoginScreen = ({ onAuthenticated, onSwitchToRegister }: LoginScreenProps) 
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={styles.card}>
-          <Text style={styles.title}>JogaMuito</Text>
-          <Text style={styles.subtitle}>Entre com sua conta para continuar.</Text>
+          <View style={styles.hero}>
+            <Text style={styles.eyebrow}>⚽ JogaMuito</Text>
+            <Text style={styles.title}>Entre para organizar seu próximo jogo.</Text>
+            <Text style={styles.subtitle}>Defina times, custos e convites em um só lugar.</Text>
+          </View>
 
           <TextInput
             testID="emailInput"
             style={styles.input}
             placeholder="Email"
-            placeholderTextColor="#94a3b8"
+            placeholderTextColor={theme.colors.textMuted}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -89,7 +93,7 @@ const LoginScreen = ({ onAuthenticated, onSwitchToRegister }: LoginScreenProps) 
             testID="passwordInput"
             style={styles.input}
             placeholder="Senha"
-            placeholderTextColor="#94a3b8"
+            placeholderTextColor={theme.colors.textMuted}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -119,62 +123,70 @@ const LoginScreen = ({ onAuthenticated, onSwitchToRegister }: LoginScreenProps) 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: theme.colors.background,
   },
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 24,
+    padding: theme.spacing.xl,
   },
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 4,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.xl,
+    ...theme.shadows.card,
+  },
+  hero: {
+    paddingBottom: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  eyebrow: {
+    color: theme.colors.primaryDark,
+    fontWeight: '700',
+    marginBottom: theme.spacing.xs,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
-    color: '#111827',
+    color: theme.colors.text,
     textAlign: 'center',
   },
   subtitle: {
-    marginTop: 8,
-    marginBottom: 20,
+    marginTop: theme.spacing.xs,
+    marginBottom: theme.spacing.sm,
     fontSize: 15,
-    color: '#6b7280',
+    color: theme.colors.textMuted,
     textAlign: 'center',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 12,
-    color: '#111827',
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.sm,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    marginBottom: theme.spacing.sm,
+    color: theme.colors.text,
+    backgroundColor: theme.colors.surfaceAlt,
   },
   button: {
-    backgroundColor: '#2563eb',
-    borderRadius: 12,
-    paddingVertical: 14,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.radius.sm,
+    paddingVertical: theme.spacing.sm,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: theme.spacing.xs,
   },
   buttonText: {
     color: '#ffffff',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   linkText: {
-    marginTop: 16,
-    color: '#2563eb',
+    marginTop: theme.spacing.md,
+    color: theme.colors.primaryDark,
     textAlign: 'center',
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });
 
