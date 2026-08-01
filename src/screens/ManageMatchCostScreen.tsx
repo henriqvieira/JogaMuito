@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { theme } from '../design/theme';
 import {
   calculateMatchCostSummary,
   saveMatchCost,
@@ -123,16 +124,18 @@ const ManageMatchCostScreen = ({ onBack }: ManageMatchCostScreenProps) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <View style={styles.header}>
-          <Pressable style={styles.backButton} onPress={onBack}>
-            <Text style={styles.backButtonText}>Voltar</Text>
-          </Pressable>
-          <Text style={styles.title}>Custos da partida</Text>
-        </View>
+        <View style={styles.headerCard}>
+          <View style={styles.header}>
+            <Pressable style={styles.backButton} onPress={onBack}>
+              <Text style={styles.backButtonText}>Voltar</Text>
+            </Pressable>
+            <Text style={styles.title}>Custos da partida</Text>
+          </View>
 
-        <Text style={styles.subtitle}>
-          Informe o valor total, adicione os jogadores e escolha quem sera isento para dividir automaticamente.
-        </Text>
+          <Text style={styles.subtitle}>
+            Informe o valor total, adicione os jogadores e escolha quem será isento para dividir automaticamente.
+          </Text>
+        </View>
 
         <Text style={styles.label}>ID do grupo</Text>
         <TextInput
@@ -249,60 +252,66 @@ const ManageMatchCostScreen = ({ onBack }: ManageMatchCostScreenProps) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#eff6ff',
+    backgroundColor: theme.colors.background,
   },
   container: {
-    padding: 20,
-    paddingTop: 32,
+    padding: theme.spacing.lg,
+    paddingTop: theme.spacing.xl,
+  },
+  headerCard: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.lg,
+    ...theme.shadows.card,
+    marginBottom: theme.spacing.lg,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 18,
+    marginBottom: theme.spacing.sm,
   },
   backButton: {
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: '#dbeafe',
-    borderRadius: 10,
-    marginRight: 12,
+    backgroundColor: theme.colors.surfaceAlt,
+    borderRadius: theme.radius.sm,
+    marginRight: theme.spacing.sm,
   },
   backButtonText: {
     fontSize: 14,
-    color: '#1e3a8a',
+    color: theme.colors.text,
     fontWeight: '600',
   },
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#0f172a',
+    color: theme.colors.text,
   },
   subtitle: {
     fontSize: 15,
-    color: '#334155',
-    marginBottom: 20,
+    color: theme.colors.textMuted,
   },
   label: {
     fontSize: 14,
-    color: '#111827',
+    color: theme.colors.text,
     fontWeight: '600',
     marginBottom: 6,
   },
   input: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.sm,
     borderWidth: 1,
-    borderColor: '#bfdbfe',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    borderColor: theme.colors.border,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
     fontSize: 15,
-    color: '#0f172a',
-    marginBottom: 14,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.sm,
   },
   playerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: theme.spacing.sm,
   },
   playerInput: {
     flex: 1,
@@ -310,10 +319,10 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   addPlayerButton: {
-    backgroundColor: '#2563eb',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.radius.sm,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
   },
   addPlayerButtonText: {
     color: '#ffffff',
@@ -321,8 +330,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   playerList: {
-    marginTop: 8,
-    marginBottom: 20,
+    marginTop: theme.spacing.sm,
+    marginBottom: theme.spacing.lg,
   },
   emptyText: {
     fontSize: 14,

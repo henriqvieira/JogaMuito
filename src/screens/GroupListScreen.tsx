@@ -15,6 +15,7 @@ import {
   View,
 } from 'react-native';
 import Share from 'react-native-share';
+import { theme } from '../design/theme';
 import {
   addGroup,
   createGroupEvent,
@@ -65,12 +66,25 @@ const GroupListScreen = ({ onLogout, onBack }: GroupListScreenProps) => {
 
     setLoading(true);
     try {
-      await addGroup({
+      const createdGroup = await addGroup({
         name: name.trim(),
         description: description.trim(),
         isPublic,
         ownerId: getCurrentUserId(),
       });
+
+      const newGroup: GameGroup = {
+        id: createdGroup.id,
+        name: name.trim(),
+        description: description.trim(),
+        isPublic,
+        ownerId: getCurrentUserId(),
+        members: [getCurrentUserId()].filter(Boolean) as string[],
+        admins: [getCurrentUserId()].filter(Boolean) as string[],
+        paymentExemptions: [],
+      };
+
+      setGroups(prev => [newGroup, ...prev]);
       setName('');
       setDescription('');
       setIsPublic(true);
@@ -393,49 +407,57 @@ const GroupListScreen = ({ onLogout, onBack }: GroupListScreenProps) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#eef2ff',
+    backgroundColor: theme.colors.background,
   },
   container: {
-    padding: 20,
-    paddingBottom: 40,
+    padding: theme.spacing.lg,
+    paddingBottom: theme.spacing.xxl,
+  },
+  heroCard: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.lg,
+    ...theme.shadows.card,
+    marginBottom: theme.spacing.lg,
   },
   screenTitle: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: '700',
-    color: '#1f2937',
-    marginBottom: 18,
+    color: theme.colors.text,
+  },
+  heroSubtitle: {
+    marginTop: theme.spacing.sm,
+    color: theme.colors.textMuted,
+    fontSize: 14,
   },
   card: {
-    borderRadius: 18,
-    backgroundColor: '#ffffff',
-    padding: 18,
-    marginBottom: 22,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.surface,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.lg,
+    ...theme.shadows.card,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
-    marginBottom: 14,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.sm,
   },
   label: {
     fontSize: 14,
-    color: '#374151',
+    color: theme.colors.textMuted,
     marginBottom: 6,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.sm,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
     fontSize: 15,
-    color: '#111827',
-    backgroundColor: '#f9fafb',
-    marginBottom: 14,
+    color: theme.colors.text,
+    backgroundColor: theme.colors.surfaceAlt,
+    marginBottom: theme.spacing.sm,
   },
   textArea: {
     minHeight: 90,
@@ -445,14 +467,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 18,
+    marginBottom: theme.spacing.md,
   },
   button: {
-    backgroundColor: '#2563eb',
-    borderRadius: 12,
-    paddingVertical: 14,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.radius.sm,
+    paddingVertical: theme.spacing.sm,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  generateButton: {
+    marginTop: theme.spacing.sm,
+    backgroundColor: theme.colors.primaryDark,
   },
   buttonDisabled: {
     opacity: 0.65,
@@ -465,14 +491,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
-    marginBottom: 12,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.sm,
   },
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 18,
+    marginBottom: theme.spacing.sm,
   },
   titleRow: {
     flexDirection: 'row',
@@ -480,22 +506,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backButton: {
-    marginRight: 10,
+    marginRight: theme.spacing.sm,
     paddingVertical: 6,
     paddingHorizontal: 10,
-    backgroundColor: '#e5e7eb',
-    borderRadius: 10,
+    backgroundColor: theme.colors.surfaceAlt,
+    borderRadius: theme.radius.sm,
   },
   backButtonText: {
     fontSize: 14,
-    color: '#111827',
+    color: theme.colors.text,
     fontWeight: '600',
   },
   logoutButton: {
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: '#ef4444',
-    borderRadius: 12,
+    backgroundColor: theme.colors.danger,
+    borderRadius: theme.radius.sm,
   },
   logoutButtonText: {
     color: '#ffffff',
@@ -503,15 +529,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   listContainer: {
-    paddingBottom: 40,
+    paddingBottom: theme.spacing.xxl,
   },
   groupCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: theme.colors.border,
+    ...theme.shadows.card,
   },
   groupHeader: {
     flexDirection: 'row',
@@ -522,14 +549,14 @@ const styles = StyleSheet.create({
   groupName: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#111827',
+    color: theme.colors.text,
     flex: 1,
   },
   groupBadge: {
-    marginLeft: 12,
+    marginLeft: theme.spacing.sm,
     fontSize: 12,
     fontWeight: '700',
-    color: '#2563eb',
+    color: theme.colors.primaryDark,
   },
   badgeRow: {
     flexDirection: 'row',
@@ -539,44 +566,44 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 12,
     fontWeight: '700',
-    color: '#10b981',
+    color: theme.colors.primaryDark,
   },
   adminActionsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginTop: 14,
+    marginTop: theme.spacing.md,
   },
   adminActionButton: {
     paddingVertical: 10,
     paddingHorizontal: 12,
-    backgroundColor: '#f3f4f6',
-    borderRadius: 12,
+    backgroundColor: theme.colors.surfaceAlt,
+    borderRadius: theme.radius.sm,
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: theme.colors.border,
     marginBottom: 8,
     minWidth: '30%',
   },
   adminActionText: {
-    color: '#111827',
+    color: theme.colors.text,
     fontWeight: '700',
     textAlign: 'center',
     fontSize: 12,
   },
   groupDescription: {
     fontSize: 14,
-    color: '#4b5563',
+    color: theme.colors.textMuted,
     marginBottom: 10,
   },
   groupMeta: {
     fontSize: 12,
-    color: '#6b7280',
+    color: theme.colors.textMuted,
   },
   shareButton: {
-    marginTop: 12,
+    marginTop: theme.spacing.sm,
     backgroundColor: '#25d366',
-    borderRadius: 12,
-    paddingVertical: 12,
+    borderRadius: theme.radius.sm,
+    paddingVertical: theme.spacing.sm,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -588,35 +615,35 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(15, 23, 42, 0.45)',
+    backgroundColor: theme.colors.overlay,
   },
   modalContent: {
-    backgroundColor: '#ffffff',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 20,
+    backgroundColor: theme.colors.surface,
+    borderTopLeftRadius: theme.radius.xl,
+    borderTopRightRadius: theme.radius.xl,
+    padding: theme.spacing.lg,
     minHeight: 360,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#111827',
-    marginBottom: 18,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.md,
   },
   modalButtonsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 18,
+    marginTop: theme.spacing.md,
   },
   modalButton: {
     flex: 1,
     marginHorizontal: 4,
   },
   emptyText: {
-    color: '#6b7280',
+    color: theme.colors.textMuted,
     fontSize: 14,
     textAlign: 'center',
-    marginTop: 18,
+    marginTop: theme.spacing.md,
   },
 });
 

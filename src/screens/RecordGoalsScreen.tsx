@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { theme } from '../design/theme';
 import {
   GameEvent,
   MatchResult,
@@ -206,14 +207,16 @@ const RecordGoalsScreen = ({ onBack }: RecordGoalsScreenProps) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <View style={styles.header}>
-          <Pressable style={styles.backButton} onPress={onBack}>
-            <Text style={styles.backButtonText}>Voltar</Text>
-          </Pressable>
-          <Text style={styles.title}>Registrar gols</Text>
-        </View>
+        <View style={styles.headerCard}>
+          <View style={styles.header}>
+            <Pressable style={styles.backButton} onPress={onBack}>
+              <Text style={styles.backButtonText}>Voltar</Text>
+            </Pressable>
+            <Text style={styles.title}>Registrar gols</Text>
+          </View>
 
-        <Text style={styles.subtitle}>Registre gols durante ou apos o jogo e salve o resultado automaticamente.</Text>
+          <Text style={styles.subtitle}>Registre gols durante ou após o jogo e salve o resultado automaticamente.</Text>
+        </View>
 
         <Text style={styles.label}>ID do grupo</Text>
         <View style={styles.eventIdRow}>

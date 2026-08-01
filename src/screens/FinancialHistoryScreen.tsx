@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { theme } from '../design/theme';
 import { GroupFinancialHistory, getGroupFinancialHistory } from '../services/matchCostService';
 
 type FinancialHistoryScreenProps = {
@@ -46,16 +47,18 @@ const FinancialHistoryScreen = ({ onBack }: FinancialHistoryScreenProps) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <View style={styles.header}>
-          <Pressable style={styles.backButton} onPress={onBack}>
-            <Text style={styles.backButtonText}>Voltar</Text>
-          </Pressable>
-          <Text style={styles.title}>Historico financeiro</Text>
-        </View>
+        <View style={styles.headerCard}>
+          <View style={styles.header}>
+            <Pressable style={styles.backButton} onPress={onBack}>
+              <Text style={styles.backButtonText}>Voltar</Text>
+            </Pressable>
+            <Text style={styles.title}>Histórico financeiro</Text>
+          </View>
 
-        <Text style={styles.subtitle}>
-          Consulte por grupo quanto cada jogador ja pagou, quanto ainda deve e os totais acumulados.
-        </Text>
+          <Text style={styles.subtitle}>
+            Consulte por grupo quanto cada jogador já pagou, quanto ainda deve e os totais acumulados.
+          </Text>
+        </View>
 
         <Text style={styles.label}>ID do grupo</Text>
         <View style={styles.searchRow}>
@@ -109,69 +112,75 @@ const FinancialHistoryScreen = ({ onBack }: FinancialHistoryScreenProps) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: theme.colors.background,
   },
   container: {
-    padding: 20,
-    paddingTop: 32,
+    padding: theme.spacing.lg,
+    paddingTop: theme.spacing.xl,
+  },
+  headerCard: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.lg,
+    ...theme.shadows.card,
+    marginBottom: theme.spacing.lg,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 18,
+    marginBottom: theme.spacing.sm,
   },
   backButton: {
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: '#e2e8f0',
-    borderRadius: 10,
-    marginRight: 12,
+    backgroundColor: theme.colors.surfaceAlt,
+    borderRadius: theme.radius.sm,
+    marginRight: theme.spacing.sm,
   },
   backButtonText: {
     fontSize: 14,
-    color: '#0f172a',
+    color: theme.colors.text,
     fontWeight: '600',
   },
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#0f172a',
+    color: theme.colors.text,
   },
   subtitle: {
     fontSize: 15,
-    color: '#334155',
-    marginBottom: 20,
+    color: theme.colors.textMuted,
   },
   label: {
     fontSize: 14,
-    color: '#0f172a',
+    color: theme.colors.text,
     fontWeight: '600',
     marginBottom: 6,
   },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 18,
+    marginBottom: theme.spacing.lg,
   },
   input: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.sm,
     borderWidth: 1,
-    borderColor: '#cbd5e1',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    borderColor: theme.colors.border,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
     fontSize: 15,
-    color: '#0f172a',
+    color: theme.colors.text,
   },
   searchInput: {
     flex: 1,
-    marginRight: 10,
+    marginRight: theme.spacing.sm,
   },
   loadButton: {
-    backgroundColor: '#0ea5e9',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.radius.sm,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
   },
   loadButtonText: {
     color: '#ffffff',
@@ -179,67 +188,68 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   summaryCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 14,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
     borderWidth: 1,
-    borderColor: '#bfdbfe',
-    padding: 14,
-    marginBottom: 18,
+    borderColor: theme.colors.border,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
+    ...theme.shadows.card,
   },
   summaryTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0f172a',
+    color: theme.colors.text,
     marginBottom: 8,
   },
   summaryLine: {
     fontSize: 14,
-    color: '#334155',
+    color: theme.colors.textMuted,
     marginBottom: 4,
   },
   summaryValue: {
     marginTop: 4,
     fontSize: 15,
-    color: '#0f766e',
+    color: theme.colors.primaryDark,
     fontWeight: '700',
   },
   playersSection: {
-    marginBottom: 20,
+    marginBottom: theme.spacing.xl,
   },
   playersTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0f172a',
-    marginBottom: 10,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.sm,
   },
   playerCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    padding: 12,
-    marginBottom: 10,
+    borderColor: theme.colors.border,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
   },
   playerName: {
     fontSize: 15,
-    color: '#0f172a',
+    color: theme.colors.text,
     fontWeight: '700',
     marginBottom: 6,
   },
   playerLine: {
     fontSize: 14,
-    color: '#334155',
+    color: theme.colors.textMuted,
     marginBottom: 2,
   },
   playerTotal: {
     fontSize: 14,
-    color: '#0f766e',
+    color: theme.colors.primaryDark,
     fontWeight: '700',
     marginTop: 4,
   },
   playerMatches: {
     fontSize: 12,
-    color: '#64748b',
+    color: theme.colors.textMuted,
     marginTop: 4,
   },
 });

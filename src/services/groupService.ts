@@ -6,8 +6,6 @@ import {
   doc,
   getDoc,
   getDocs,
-  onSnapshot,
-  orderBy,
   query,
   serverTimestamp,
   Timestamp,
@@ -221,34 +219,49 @@ export const subscribeToGroups = (
   callback: (groups: GameGroup[]) => void,
   errorCallback?: (error: Error) => void,
 ) => {
-  const groupsQuery = query(groupsCollection, orderBy('createdAt', 'desc'));
+  let isActive = true;
 
-  return onSnapshot(
-    groupsQuery,
-    snapshot => {
-      const groups = snapshot.docs.map(doc => {
-        const data = doc.data() as DocumentData;
-        return {
-          id: doc.id,
-          name: data.name ?? '',
-          description: data.description ?? '',
-          isPublic: data.isPublic ?? false,
-          ownerId: data.ownerId ?? null,
-          createdAt: data.createdAt ?? null,
-          members: data.members ?? [],
-          admins: data.admins ?? [],
-          paymentExemptions: data.paymentExemptions ?? [],
-        } as GameGroup;
-      });
+  const loadGroups = async () => {
+    try {
+      const snapshot = await getDocs(query(groupsCollection));
+      if (!isActive) {
+        return;
+      }
+
+      const groups = snapshot.docs
+        .map(docSnapshot => {
+          const data = docSnapshot.data() as DocumentData;
+          return {
+            id: docSnapshot.id,
+            name: data.name ?? '',
+            description: data.description ?? '',
+            isPublic: data.isPublic ?? false,
+            ownerId: data.ownerId ?? null,
+            createdAt: data.createdAt ?? null,
+            members: data.members ?? [],
+            admins: data.admins ?? [],
+            paymentExemptions: data.paymentExemptions ?? [],
+          } as GameGroup;
+        })
+        .sort((left, right) => {
+          const leftTime = left.createdAt?.toMillis?.() ?? 0;
+          const rightTime = right.createdAt?.toMillis?.() ?? 0;
+          return rightTime - leftTime;
+        });
 
       callback(groups);
-    },
-    error => {
+    } catch (error) {
       if (errorCallback) {
-        errorCallback(error);
+        errorCallback(error as Error);
       }
-    },
-  );
+    }
+  };
+
+  loadGroups();
+
+  return () => {
+    isActive = false;
+  };
 };
 
 export { getCurrentUserId };
