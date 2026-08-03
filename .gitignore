@@ -34,6 +34,7 @@ temp_rn_init/
 !.env.sample
 android/app/google-services.json
 **/google-services*.json
+ios/**/GoogleService-Info.plist
 *.keystore
 *.jks
 *.p12

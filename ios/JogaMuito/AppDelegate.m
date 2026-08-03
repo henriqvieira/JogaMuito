@@ -1,4 +1,5 @@
 #import "AppDelegate.h"
+#import <FirebaseCore/FirebaseCore.h>
 #import <React/RCTAppDependencyProvider.h>
 #import <React/RCTBundleURLProvider.h>
 
@@ -6,6 +7,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  if ([FIRApp defaultApp] == nil) {
+    [FIRApp configure];
+  }
+
   self.moduleName = @"JogaMuito";
   self.dependencyProvider = [RCTAppDependencyProvider new];
   self.initialProps = @{};
