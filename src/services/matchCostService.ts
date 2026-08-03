@@ -124,29 +124,29 @@ export const calculateMatchCostSummary = (
   }
 
   const normalizedPlayers = players
-    .map(player => ({
+    .map((player) => ({
       name: player.name.trim(),
       isExempt: Boolean(player.isExempt),
     }))
-    .filter(player => player.name.length > 0);
+    .filter((player) => player.name.length > 0);
 
   if (normalizedPlayers.length === 0) {
     throw new Error('Adicione ao menos um jogador para calcular os custos.');
   }
 
-  const uniqueNames = new Set(normalizedPlayers.map(player => player.name.toLowerCase()));
+  const uniqueNames = new Set(normalizedPlayers.map((player) => player.name.toLowerCase()));
   if (uniqueNames.size !== normalizedPlayers.length) {
     throw new Error('Existem jogadores duplicados na lista.');
   }
 
-  const chargeablePlayers = normalizedPlayers.filter(player => !player.isExempt).length;
+  const chargeablePlayers = normalizedPlayers.filter((player) => !player.isExempt).length;
   if (chargeablePlayers === 0) {
     throw new Error('Pelo menos um jogador deve participar da divisao de custos.');
   }
 
   const amountPerPlayer = roundToCents(totalAmount / chargeablePlayers);
 
-  const breakdown = normalizedPlayers.map(player => ({
+  const breakdown = normalizedPlayers.map((player) => ({
     name: player.name,
     isExempt: player.isExempt,
     amount: player.isExempt ? 0 : amountPerPlayer,
@@ -220,7 +220,7 @@ export const updateMatchCost = async (input: UpdateMatchCostInput) => {
 
   const summary = calculateMatchCostSummary(input.totalAmount, input.players);
 
-  return runTransaction(db, async transaction => {
+  return runTransaction(db, async (transaction) => {
     const freshSnapshot = await transaction.get(matchCostRef);
     if (!freshSnapshot.exists()) {
       throw new Error('Registro de custo nao encontrado.');
@@ -266,15 +266,17 @@ export const confirmMatchCostPayment = async (input: ConfirmMatchCostPaymentInpu
 
   await assertUserIsGroupAdmin(groupId);
 
-  return runTransaction(db, async transaction => {
+  return runTransaction(db, async (transaction) => {
     const freshSnapshot = await transaction.get(matchCostRef);
     if (!freshSnapshot.exists()) {
       throw new Error('Registro de custo nao encontrado.');
     }
 
     const data = freshSnapshot.data();
-    const breakdown = ((data.breakdown ?? []) as MatchCostPlayerBreakdown[]).map(item => ({ ...item }));
-    const index = breakdown.findIndex(item => item.name === normalizedPlayerName);
+    const breakdown = ((data.breakdown ?? []) as MatchCostPlayerBreakdown[]).map((item) => ({
+      ...item,
+    }));
+    const index = breakdown.findIndex((item) => item.name === normalizedPlayerName);
 
     if (index < 0) {
       throw new Error('Jogador nao encontrado no registro financeiro.');
@@ -315,7 +317,7 @@ export const getMatchCostsByGroup = async (groupId: string) => {
 
   const snapshot = await getDocs(costsQuery);
 
-  return snapshot.docs.map(docSnapshot => {
+  return snapshot.docs.map((docSnapshot) => {
     const data = docSnapshot.data();
     return {
       id: docSnapshot.id,
@@ -339,8 +341,8 @@ export const getGroupFinancialHistory = async (groupId: string) => {
   let totalPaid = 0;
   let totalOwed = 0;
 
-  records.forEach(record => {
-    (record.breakdown ?? []).forEach(item => {
+  records.forEach((record) => {
+    (record.breakdown ?? []).forEach((item) => {
       const key = item.name.trim();
       if (!key) {
         return;

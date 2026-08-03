@@ -38,13 +38,13 @@ const CreateGameEventScreen = ({ onBack }: CreateGameEventScreenProps) => {
       return;
     }
 
-    setParticipants(prev => [...prev, normalizedName]);
+    setParticipants((prev) => [...prev, normalizedName]);
     setParticipantName('');
   };
 
   const handleRemoveParticipant = (name: string) => {
-    setParticipants(prev => prev.filter(participant => participant !== name));
-    setTeamAssignments(prev => {
+    setParticipants((prev) => prev.filter((participant) => participant !== name));
+    setTeamAssignments((prev) => {
       const nextAssignments = { ...prev };
       delete nextAssignments[name];
       return nextAssignments;
@@ -52,7 +52,7 @@ const CreateGameEventScreen = ({ onBack }: CreateGameEventScreenProps) => {
   };
 
   const handleAssignTeam = (name: string, team: 'A' | 'B') => {
-    setTeamAssignments(prev => {
+    setTeamAssignments((prev) => {
       if (prev[name] === team) {
         const nextAssignments = { ...prev };
         delete nextAssignments[name];
@@ -66,8 +66,8 @@ const CreateGameEventScreen = ({ onBack }: CreateGameEventScreenProps) => {
     });
   };
 
-  const teamA = participants.filter(player => teamAssignments[player] === 'A');
-  const teamB = participants.filter(player => teamAssignments[player] === 'B');
+  const teamA = participants.filter((player) => teamAssignments[player] === 'A');
+  const teamB = participants.filter((player) => teamAssignments[player] === 'B');
 
   const handleCreateEvent = async () => {
     setLoading(true);
@@ -111,7 +111,9 @@ const CreateGameEventScreen = ({ onBack }: CreateGameEventScreenProps) => {
             <Text style={styles.title}>Criar evento de jogo</Text>
           </View>
 
-          <Text style={styles.subtitle}>Preencha os dados, monte os times e salve no Firestore.</Text>
+          <Text style={styles.subtitle}>
+            Preencha os dados, monte os times e salve no Firestore.
+          </Text>
         </View>
 
         <Text style={styles.label}>ID do grupo</Text>
@@ -179,7 +181,7 @@ const CreateGameEventScreen = ({ onBack }: CreateGameEventScreenProps) => {
           {participants.length === 0 ? (
             <Text style={styles.emptyListText}>Nenhum participante adicionado.</Text>
           ) : (
-            participants.map(name => (
+            participants.map((name) => (
               <View key={name} style={styles.participantChip}>
                 <View style={styles.participantInfo}>
                   <Text style={styles.participantName}>{name}</Text>
@@ -190,14 +192,20 @@ const CreateGameEventScreen = ({ onBack }: CreateGameEventScreenProps) => {
                 <View style={styles.participantActions}>
                   <Pressable
                     testID={`assignTeamA-${name}`}
-                    style={[styles.teamButton, teamAssignments[name] === 'A' && styles.teamButtonActiveA]}
+                    style={[
+                      styles.teamButton,
+                      teamAssignments[name] === 'A' && styles.teamButtonActiveA,
+                    ]}
                     onPress={() => handleAssignTeam(name, 'A')}
                   >
                     <Text style={styles.teamButtonText}>Time A</Text>
                   </Pressable>
                   <Pressable
                     testID={`assignTeamB-${name}`}
-                    style={[styles.teamButton, teamAssignments[name] === 'B' && styles.teamButtonActiveB]}
+                    style={[
+                      styles.teamButton,
+                      teamAssignments[name] === 'B' && styles.teamButtonActiveB,
+                    ]}
                     onPress={() => handleAssignTeam(name, 'B')}
                   >
                     <Text style={styles.teamButtonText}>Time B</Text>

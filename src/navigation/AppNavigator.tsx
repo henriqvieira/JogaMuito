@@ -11,7 +11,7 @@ const AppNavigator = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async user => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         await saveAuthSession({
           uid: user.uid,

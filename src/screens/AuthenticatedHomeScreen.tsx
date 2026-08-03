@@ -62,28 +62,52 @@ const AuthenticatedHomeScreen = ({ onLogout }: AuthenticatedHomeScreenProps) => 
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.heroCard}>
-          <Text testID="homeTitle" style={styles.title}>Bem-vindo ao JogaMuito</Text>
-          <Text style={styles.subtitle}>Seu clube em campo está pronto para organizar jogos, finanças e estatísticas.</Text>
+          <Text testID="homeTitle" style={styles.title}>
+            Bem-vindo ao JogaMuito
+          </Text>
+          <Text style={styles.subtitle}>
+            Seu clube em campo está pronto para organizar jogos, finanças e estatísticas.
+          </Text>
         </View>
 
         <View style={styles.actionsGrid}>
-          <Pressable testID="viewGroupsButton" style={[styles.button, styles.primaryButton]} onPress={() => setShowGroups(true)}>
+          <Pressable
+            testID="viewGroupsButton"
+            style={[styles.button, styles.primaryButton]}
+            onPress={() => setShowGroups(true)}
+          >
             <Text style={styles.buttonText}>Ver grupos</Text>
           </Pressable>
 
-          <Pressable testID="acceptInviteButton" style={[styles.button, styles.secondaryButton]} onPress={() => setShowAcceptInvite(true)}>
+          <Pressable
+            testID="acceptInviteButton"
+            style={[styles.button, styles.secondaryButton]}
+            onPress={() => setShowAcceptInvite(true)}
+          >
             <Text style={styles.buttonText}>Aceitar convite</Text>
           </Pressable>
 
-          <Pressable testID="createGameEventButton" style={[styles.button, styles.eventButton]} onPress={() => setShowCreateEvent(true)}>
+          <Pressable
+            testID="createGameEventButton"
+            style={[styles.button, styles.eventButton]}
+            onPress={() => setShowCreateEvent(true)}
+          >
             <Text style={styles.buttonText}>Criar evento</Text>
           </Pressable>
 
-          <Pressable testID="recordGoalsButton" style={[styles.button, styles.goalsButton]} onPress={() => setShowRecordGoals(true)}>
+          <Pressable
+            testID="recordGoalsButton"
+            style={[styles.button, styles.goalsButton]}
+            onPress={() => setShowRecordGoals(true)}
+          >
             <Text style={styles.buttonText}>Registrar gols</Text>
           </Pressable>
 
-          <Pressable testID="manageMatchCostsButton" style={[styles.button, styles.costsButton]} onPress={() => setShowManageCosts(true)}>
+          <Pressable
+            testID="manageMatchCostsButton"
+            style={[styles.button, styles.costsButton]}
+            onPress={() => setShowManageCosts(true)}
+          >
             <Text style={styles.buttonText}>Gerenciar custos</Text>
           </Pressable>
 

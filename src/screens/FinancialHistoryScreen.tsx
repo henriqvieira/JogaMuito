@@ -38,7 +38,10 @@ const FinancialHistoryScreen = ({ onBack }: FinancialHistoryScreenProps) => {
         Alert.alert('Sem registros', 'Nao ha custos salvos para esse grupo.');
       }
     } catch (error: any) {
-      Alert.alert('Erro ao carregar historico', error.message ?? 'Nao foi possivel consultar dados no Firestore.');
+      Alert.alert(
+        'Erro ao carregar historico',
+        error.message ?? 'Nao foi possivel consultar dados no Firestore.',
+      );
     } finally {
       setLoading(false);
     }
@@ -56,7 +59,8 @@ const FinancialHistoryScreen = ({ onBack }: FinancialHistoryScreenProps) => {
           </View>
 
           <Text style={styles.subtitle}>
-            Consulte por grupo quanto cada jogador já pagou, quanto ainda deve e os totais acumulados.
+            Consulte por grupo quanto cada jogador já pagou, quanto ainda deve e os totais
+            acumulados.
           </Text>
         </View>
 
@@ -83,23 +87,51 @@ const FinancialHistoryScreen = ({ onBack }: FinancialHistoryScreenProps) => {
 
         {history ? (
           <View testID="financialHistorySummaryCard" style={styles.summaryCard}>
-            <Text testID="financialHistoryGroupTitle" style={styles.summaryTitle}>Totais do grupo {history.groupId}</Text>
-            <Text testID="financialHistoryTotalPaidText" style={styles.summaryLine}>Total pago: {formatCurrency(history.totalPaid)}</Text>
-            <Text testID="financialHistoryTotalOwedText" style={styles.summaryLine}>Total devido: {formatCurrency(history.totalOwed)}</Text>
-            <Text testID="financialHistoryGrandTotalText" style={styles.summaryValue}>Total acumulado: {formatCurrency(history.grandTotal)}</Text>
+            <Text testID="financialHistoryGroupTitle" style={styles.summaryTitle}>
+              Totais do grupo {history.groupId}
+            </Text>
+            <Text testID="financialHistoryTotalPaidText" style={styles.summaryLine}>
+              Total pago: {formatCurrency(history.totalPaid)}
+            </Text>
+            <Text testID="financialHistoryTotalOwedText" style={styles.summaryLine}>
+              Total devido: {formatCurrency(history.totalOwed)}
+            </Text>
+            <Text testID="financialHistoryGrandTotalText" style={styles.summaryValue}>
+              Total acumulado: {formatCurrency(history.grandTotal)}
+            </Text>
           </View>
         ) : null}
 
         {history && history.players.length > 0 ? (
           <View style={styles.playersSection}>
             <Text style={styles.playersTitle}>Resumo por jogador</Text>
-            {history.players.map(player => (
-              <View key={player.playerName} testID={`financialPlayerCard-${player.playerName}`} style={styles.playerCard}>
-                <Text testID={`financialPlayerName-${player.playerName}`} style={styles.playerName}>{player.playerName}</Text>
-                <Text testID={`financialPlayerPaid-${player.playerName}`} style={styles.playerLine}>Pago: {formatCurrency(player.paid)}</Text>
-                <Text testID={`financialPlayerOwed-${player.playerName}`} style={styles.playerLine}>Deve: {formatCurrency(player.owed)}</Text>
-                <Text testID={`financialPlayerTotal-${player.playerName}`} style={styles.playerTotal}>Acumulado: {formatCurrency(player.total)}</Text>
-                <Text testID={`financialPlayerMatches-${player.playerName}`} style={styles.playerMatches}>Partidas registradas: {player.matches}</Text>
+            {history.players.map((player) => (
+              <View
+                key={player.playerName}
+                testID={`financialPlayerCard-${player.playerName}`}
+                style={styles.playerCard}
+              >
+                <Text testID={`financialPlayerName-${player.playerName}`} style={styles.playerName}>
+                  {player.playerName}
+                </Text>
+                <Text testID={`financialPlayerPaid-${player.playerName}`} style={styles.playerLine}>
+                  Pago: {formatCurrency(player.paid)}
+                </Text>
+                <Text testID={`financialPlayerOwed-${player.playerName}`} style={styles.playerLine}>
+                  Deve: {formatCurrency(player.owed)}
+                </Text>
+                <Text
+                  testID={`financialPlayerTotal-${player.playerName}`}
+                  style={styles.playerTotal}
+                >
+                  Acumulado: {formatCurrency(player.total)}
+                </Text>
+                <Text
+                  testID={`financialPlayerMatches-${player.playerName}`}
+                  style={styles.playerMatches}
+                >
+                  Partidas registradas: {player.matches}
+                </Text>
               </View>
             ))}
           </View>

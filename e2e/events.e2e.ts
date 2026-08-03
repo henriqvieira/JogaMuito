@@ -13,7 +13,9 @@ describe('Event flow', () => {
 
   it('should create event, assign teams, register goal and show final score', async () => {
     if (!E2E_GROUP_ID) {
-      throw new Error('E2E_GROUP_ID nao definido. Configure um grupo onde o usuario de teste seja admin.');
+      throw new Error(
+        'E2E_GROUP_ID nao definido. Configure um grupo onde o usuario de teste seja admin.',
+      );
     }
 
     const suffix = Date.now().toString().slice(-6);
@@ -45,9 +47,13 @@ describe('Event flow', () => {
     await element(by.id('saveEventButton')).tap();
 
     try {
-      await waitFor(element(by.text('OK'))).toBeVisible().withTimeout(3000);
+      await waitFor(element(by.text('OK')))
+        .toBeVisible()
+        .withTimeout(3000);
       await element(by.text('OK')).tap();
-    } catch {}
+    } catch {
+      // Dialog might not appear depending on execution timing.
+    }
 
     await expect(element(by.id('homeTitle'))).toBeVisible();
 
@@ -58,11 +64,17 @@ describe('Event flow', () => {
     await element(by.id('loadLatestEventButton')).tap();
 
     try {
-      await waitFor(element(by.text('OK'))).toBeVisible().withTimeout(3000);
+      await waitFor(element(by.text('OK')))
+        .toBeVisible()
+        .withTimeout(3000);
       await element(by.text('OK')).tap();
-    } catch {}
+    } catch {
+      // Dialog might not appear depending on execution timing.
+    }
 
-    await waitFor(element(by.text(`Evento: ${eventLocation}`))).toBeVisible().withTimeout(10000);
+    await waitFor(element(by.text(`Evento: ${eventLocation}`)))
+      .toBeVisible()
+      .withTimeout(10000);
 
     await element(by.text('Ana')).atIndex(0).tap();
     await element(by.id('goalTeamAButton')).tap();
@@ -70,10 +82,16 @@ describe('Event flow', () => {
     await element(by.id('registerGoalButton')).tap();
 
     try {
-      await waitFor(element(by.text('OK'))).toBeVisible().withTimeout(3000);
+      await waitFor(element(by.text('OK')))
+        .toBeVisible()
+        .withTimeout(3000);
       await element(by.text('OK')).tap();
-    } catch {}
+    } catch {
+      // Dialog might not appear depending on execution timing.
+    }
 
-    await waitFor(element(by.id('resultScoreText'))).toHaveText('Time A 1 x 0 Time B').withTimeout(10000);
+    await waitFor(element(by.id('resultScoreText')))
+      .toHaveText('Time A 1 x 0 Time B')
+      .withTimeout(10000);
   });
 });

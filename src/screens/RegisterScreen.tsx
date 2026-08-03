@@ -75,12 +75,15 @@ const RegisterScreen = ({ onRegistered, onSwitchToLogin }: RegisterScreenProps) 
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
         <View style={styles.card}>
           <View style={styles.hero}>
             <Text style={styles.eyebrow}>⚽ Novo no JogaMuito?</Text>
             <Text style={styles.title}>Crie sua conta e monte seu time.</Text>
-            <Text style={styles.subtitle}>Cadastre-se para centralizar eventos, finanças e convites.</Text>
+            <Text style={styles.subtitle}>
+              Cadastre-se para centralizar eventos, finanças e convites.
+            </Text>
           </View>
 
           <TextInput
@@ -123,7 +126,12 @@ const RegisterScreen = ({ onRegistered, onSwitchToLogin }: RegisterScreenProps) 
             secureTextEntry
           />
 
-          <Pressable testID="registerButton" style={styles.button} onPress={handleRegister} disabled={loading}>
+          <Pressable
+            testID="registerButton"
+            style={styles.button}
+            onPress={handleRegister}
+            disabled={loading}
+          >
             <Text style={styles.buttonText}>{loading ? 'Cadastrando...' : 'Cadastrar'}</Text>
           </Pressable>
 

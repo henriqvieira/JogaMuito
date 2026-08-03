@@ -54,22 +54,22 @@ const ManageMatchCostScreen = ({ onBack }: ManageMatchCostScreenProps) => {
       return;
     }
 
-    if (players.some(player => player.name.toLowerCase() === normalizedName.toLowerCase())) {
+    if (players.some((player) => player.name.toLowerCase() === normalizedName.toLowerCase())) {
       Alert.alert('Jogador duplicado', 'Esse jogador ja foi adicionado.');
       return;
     }
 
-    setPlayers(prev => [...prev, { name: normalizedName, isExempt: false }]);
+    setPlayers((prev) => [...prev, { name: normalizedName, isExempt: false }]);
     setPlayerName('');
   };
 
   const handleRemovePlayer = (name: string) => {
-    setPlayers(prev => prev.filter(player => player.name !== name));
+    setPlayers((prev) => prev.filter((player) => player.name !== name));
   };
 
   const handleToggleExemption = (name: string) => {
-    setPlayers(prev =>
-      prev.map(player =>
+    setPlayers((prev) =>
+      prev.map((player) =>
         player.name === name
           ? {
               ...player,
@@ -115,7 +115,10 @@ const ManageMatchCostScreen = ({ onBack }: ManageMatchCostScreenProps) => {
       setPlayers([]);
       onBack();
     } catch (error: any) {
-      Alert.alert('Erro ao salvar custos', error.message ?? 'Nao foi possivel salvar os custos no Firestore.');
+      Alert.alert(
+        'Erro ao salvar custos',
+        error.message ?? 'Nao foi possivel salvar os custos no Firestore.',
+      );
     } finally {
       setSaving(false);
     }
@@ -133,7 +136,8 @@ const ManageMatchCostScreen = ({ onBack }: ManageMatchCostScreenProps) => {
           </View>
 
           <Text style={styles.subtitle}>
-            Informe o valor total, adicione os jogadores e escolha quem será isento para dividir automaticamente.
+            Informe o valor total, adicione os jogadores e escolha quem será isento para dividir
+            automaticamente.
           </Text>
         </View>
 
@@ -194,8 +198,9 @@ const ManageMatchCostScreen = ({ onBack }: ManageMatchCostScreenProps) => {
           {players.length === 0 ? (
             <Text style={styles.emptyText}>Nenhum jogador adicionado.</Text>
           ) : (
-            players.map(player => {
-              const currentAmount = summary?.breakdown.find(item => item.name === player.name)?.amount ?? 0;
+            players.map((player) => {
+              const currentAmount =
+                summary?.breakdown.find((item) => item.name === player.name)?.amount ?? 0;
               return (
                 <View key={player.name} style={styles.playerCard}>
                   <View style={styles.playerInfo}>
@@ -208,7 +213,9 @@ const ManageMatchCostScreen = ({ onBack }: ManageMatchCostScreenProps) => {
                       style={[styles.exemptButton, player.isExempt && styles.exemptButtonActive]}
                       onPress={() => handleToggleExemption(player.name)}
                     >
-                      <Text style={styles.exemptButtonText}>{player.isExempt ? 'Isento' : 'Cobrar'}</Text>
+                      <Text style={styles.exemptButtonText}>
+                        {player.isExempt ? 'Isento' : 'Cobrar'}
+                      </Text>
                     </Pressable>
                     <Pressable onPress={() => handleRemovePlayer(player.name)}>
                       <Text style={styles.removeText}>Remover</Text>
@@ -223,7 +230,8 @@ const ManageMatchCostScreen = ({ onBack }: ManageMatchCostScreenProps) => {
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>Resumo da divisao</Text>
           <Text testID="matchCostTotalSummaryText" style={styles.summaryText}>
-            Total da partida: R$ {Number.isFinite(parsedTotalAmount) ? parsedTotalAmount.toFixed(2) : '0.00'}
+            Total da partida: R${' '}
+            {Number.isFinite(parsedTotalAmount) ? parsedTotalAmount.toFixed(2) : '0.00'}
           </Text>
           <Text testID="matchCostChargeableCountText" style={styles.summaryText}>
             Jogadores pagantes: {summary?.chargeablePlayers ?? 0}
@@ -242,7 +250,9 @@ const ManageMatchCostScreen = ({ onBack }: ManageMatchCostScreenProps) => {
           onPress={handleSaveCosts}
           disabled={saving}
         >
-          <Text style={styles.saveButtonText}>{saving ? 'Salvando...' : 'Salvar custos no Firestore'}</Text>
+          <Text style={styles.saveButtonText}>
+            {saving ? 'Salvando...' : 'Salvar custos no Firestore'}
+          </Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>

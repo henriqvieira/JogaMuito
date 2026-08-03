@@ -90,8 +90,8 @@ const isValidTime = (value: string) => /^\d{2}:\d{2}$/.test(value);
 const groupsCollection = collection(db, 'groups');
 
 const normalizeLineup = (lineup: { teamA: string[]; teamB: string[] }) => ({
-  teamA: lineup.teamA.map(player => player.trim()).filter(Boolean),
-  teamB: lineup.teamB.map(player => player.trim()).filter(Boolean),
+  teamA: lineup.teamA.map((player) => player.trim()).filter(Boolean),
+  teamB: lineup.teamB.map((player) => player.trim()).filter(Boolean),
 });
 
 const validateLineup = (participants: string[], lineup: { teamA: string[]; teamB: string[] }) => {
@@ -161,8 +161,8 @@ export const validateGameEvent = (event: CreateGameEventInput) => {
 };
 
 export const calculateMatchResult = (goals: GoalRecord[]): MatchResult => {
-  const teamA = goals.filter(goal => goal.team === 'A').length;
-  const teamB = goals.filter(goal => goal.team === 'B').length;
+  const teamA = goals.filter((goal) => goal.team === 'A').length;
+  const teamB = goals.filter((goal) => goal.team === 'B').length;
 
   if (teamA === teamB) {
     return { teamA, teamB, winner: 'draw' };
@@ -184,7 +184,7 @@ export const createGameEvent = async (event: CreateGameEventInput) => {
     date: event.date.trim(),
     time: event.time.trim(),
     location: event.location.trim(),
-    participants: event.participants.map(participant => participant.trim()).filter(Boolean),
+    participants: event.participants.map((participant) => participant.trim()).filter(Boolean),
     lineup: normalizeLineup(event.lineup),
   };
 
@@ -286,18 +286,18 @@ export const getGroupMatchReport = async (groupId: string): Promise<GroupMatchRe
   const playerMap: Record<string, GroupPlayerMatchStats> = {};
   let totalGoals = 0;
 
-  snapshot.docs.forEach(docSnapshot => {
+  snapshot.docs.forEach((docSnapshot) => {
     const data = docSnapshot.data();
 
     const teamA = (data.lineup?.teamA ?? []) as string[];
     const teamB = (data.lineup?.teamB ?? []) as string[];
 
-    const teamAPlayers = Array.from(new Set(teamA.map(player => player.trim()).filter(Boolean)));
-    const teamBPlayers = Array.from(new Set(teamB.map(player => player.trim()).filter(Boolean)));
+    const teamAPlayers = Array.from(new Set(teamA.map((player) => player.trim()).filter(Boolean)));
+    const teamBPlayers = Array.from(new Set(teamB.map((player) => player.trim()).filter(Boolean)));
 
     const winner = (data.result?.winner ?? 'draw') as TeamId | 'draw';
 
-    teamAPlayers.forEach(playerName => {
+    teamAPlayers.forEach((playerName) => {
       const stats = ensurePlayerStats(playerMap, playerName);
       if (!stats) {
         return;
@@ -311,7 +311,7 @@ export const getGroupMatchReport = async (groupId: string): Promise<GroupMatchRe
       }
     });
 
-    teamBPlayers.forEach(playerName => {
+    teamBPlayers.forEach((playerName) => {
       const stats = ensurePlayerStats(playerMap, playerName);
       if (!stats) {
         return;
@@ -326,7 +326,7 @@ export const getGroupMatchReport = async (groupId: string): Promise<GroupMatchRe
     });
 
     const goals = (data.goals ?? []) as GoalRecord[];
-    goals.forEach(goal => {
+    goals.forEach((goal) => {
       const stats = ensurePlayerStats(playerMap, goal.player ?? '');
       if (!stats) {
         return;
@@ -399,26 +399,28 @@ export const isCurrentUserGroupAdmin = async (groupId: string): Promise<boolean>
 
 const normalizeManualPlayerStats = (players: ManualPlayerStatsInput[]) => {
   const normalizedPlayers = players
-    .map(player => ({
+    .map((player) => ({
       playerName: player.playerName.trim(),
       matches: Math.max(0, Number(player.matches) || 0),
       wins: Math.max(0, Number(player.wins) || 0),
       losses: Math.max(0, Number(player.losses) || 0),
       goals: Math.max(0, Number(player.goals) || 0),
     }))
-    .filter(player => player.playerName.length > 0);
+    .filter((player) => player.playerName.length > 0);
 
-  normalizedPlayers.forEach(player => {
+  normalizedPlayers.forEach((player) => {
     if (player.matches === 0) {
       throw new Error(`Jogador sem jogos nao pode ser salvo: ${player.playerName}.`);
     }
 
     if (player.wins + player.losses > player.matches) {
-      throw new Error(`Estatisticas invalidas para ${player.playerName}: vitorias + derrotas excedem jogos.`);
+      throw new Error(
+        `Estatisticas invalidas para ${player.playerName}: vitorias + derrotas excedem jogos.`,
+      );
     }
   });
 
-  const uniqueNames = new Set(normalizedPlayers.map(player => player.playerName.toLowerCase()));
+  const uniqueNames = new Set(normalizedPlayers.map((player) => player.playerName.toLowerCase()));
   if (uniqueNames.size !== normalizedPlayers.length) {
     throw new Error('Nao e permitido salvar jogadores duplicados no relatorio.');
   }
@@ -443,7 +445,10 @@ export const updateGroupMatchReportManual = async (
   }
 
   const totalGoals = normalizedPlayers.reduce((sum, player) => sum + player.goals, 0);
-  const totalMatches = normalizedPlayers.reduce((maxValue, player) => Math.max(maxValue, player.matches), 0);
+  const totalMatches = normalizedPlayers.reduce(
+    (maxValue, player) => Math.max(maxValue, player.matches),
+    0,
+  );
 
   const report: GroupMatchReport = {
     groupId: normalizedGroupId,
@@ -485,7 +490,7 @@ export const getSavedGroupMatchReport = async (groupId: string): Promise<GroupMa
   }
 
   const data = snapshot.data();
-  const players = ((data.players ?? []) as GroupPlayerMatchStats[]).map(player => ({
+  const players = ((data.players ?? []) as GroupPlayerMatchStats[]).map((player) => ({
     playerName: player.playerName ?? '',
     matches: Number(player.matches ?? 0),
     wins: Number(player.wins ?? 0),
@@ -513,7 +518,10 @@ export const getSavedGroupMatchReport = async (groupId: string): Promise<GroupMa
   };
 };
 
-export const updateEventLineup = async (eventId: string, lineup: { teamA: string[]; teamB: string[] }) => {
+export const updateEventLineup = async (
+  eventId: string,
+  lineup: { teamA: string[]; teamB: string[] },
+) => {
   const eventRef = doc(db, 'gameEvents', eventId.trim());
   const eventSnapshot = await getDoc(eventRef);
 
@@ -533,7 +541,7 @@ export const updateEventLineup = async (eventId: string, lineup: { teamA: string
   const normalizedLineup = normalizeLineup(lineup);
   validateLineup(participants, normalizedLineup);
 
-  return runTransaction(db, async transaction => {
+  return runTransaction(db, async (transaction) => {
     const freshEvent = await transaction.get(eventRef);
     if (!freshEvent.exists()) {
       throw new Error('Evento não encontrado.');
@@ -548,7 +556,10 @@ export const updateEventLineup = async (eventId: string, lineup: { teamA: string
   });
 };
 
-export const registerEventGoal = async (eventId: string, input: { player: string; team: TeamId; minute?: number }) => {
+export const registerEventGoal = async (
+  eventId: string,
+  input: { player: string; team: TeamId; minute?: number },
+) => {
   const userId = auth.currentUser?.uid;
   if (!userId) {
     throw new Error('Autenticação necessária para registrar gols.');
@@ -577,7 +588,7 @@ export const registerEventGoal = async (eventId: string, input: { player: string
 
   await assertUserIsGroupAdmin(groupId);
 
-  return runTransaction(db, async transaction => {
+  return runTransaction(db, async (transaction) => {
     const eventSnapshot = await transaction.get(eventRef);
     if (!eventSnapshot.exists()) {
       throw new Error('Evento não encontrado.');
@@ -600,7 +611,7 @@ export const registerEventGoal = async (eventId: string, input: { player: string
       throw new Error('Jogador não pertence ao time selecionado na escalação.');
     }
 
-    const currentGoals = ((data.goals ?? []) as GoalRecord[]).map(goal => ({
+    const currentGoals = ((data.goals ?? []) as GoalRecord[]).map((goal) => ({
       ...goal,
       createdAt: goal.createdAt instanceof Timestamp ? goal.createdAt : Timestamp.now(),
     }));

@@ -30,7 +30,10 @@ const LoginScreen = ({ onAuthenticated, onSwitchToRegister }: LoginScreenProps) 
 
     try {
       if (provider === 'google') {
-        Alert.alert('Google', 'Integre o fluxo com o Google Sign-In no seu projeto React Native para concluir este provedor.');
+        Alert.alert(
+          'Google',
+          'Integre o fluxo com o Google Sign-In no seu projeto React Native para concluir este provedor.',
+        );
       } else if (provider === 'facebook') {
         Alert.alert('Facebook', 'Integre com o Facebook Login SDK para concluir este provedor.');
       } else {
@@ -70,7 +73,8 @@ const LoginScreen = ({ onAuthenticated, onSwitchToRegister }: LoginScreenProps) 
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
         <View style={styles.card}>
           <View style={styles.hero}>
             <Text style={styles.eyebrow}>⚽ JogaMuito</Text>
@@ -99,7 +103,12 @@ const LoginScreen = ({ onAuthenticated, onSwitchToRegister }: LoginScreenProps) 
             secureTextEntry
           />
 
-          <Pressable testID="loginButton" style={styles.button} onPress={handleLogin} disabled={loading}>
+          <Pressable
+            testID="loginButton"
+            style={styles.button}
+            onPress={handleLogin}
+            disabled={loading}
+          >
             <Text style={styles.buttonText}>{loading ? 'Entrando...' : 'Entrar'}</Text>
           </Pressable>
 

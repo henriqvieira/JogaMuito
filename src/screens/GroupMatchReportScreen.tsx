@@ -42,7 +42,9 @@ const GroupMatchReportScreen = ({ onBack }: GroupMatchReportScreenProps) => {
 
     data.players.forEach((player, index) => {
       lines.push(
-        `${index + 1}. ${player.playerName} | Jogos: ${player.matches} | Gols: ${player.goals} | Vitorias: ${player.wins} | Derrotas: ${player.losses}`,
+        `${index + 1}. ${player.playerName} | Jogos: ${player.matches} | Gols: ${
+          player.goals
+        } | Vitorias: ${player.wins} | Derrotas: ${player.losses}`,
       );
     });
 
@@ -78,7 +80,10 @@ const GroupMatchReportScreen = ({ onBack }: GroupMatchReportScreenProps) => {
         Alert.alert('Sem partidas', 'Nao ha partidas registradas para esse grupo ainda.');
       }
     } catch (error: any) {
-      Alert.alert('Erro ao salvar relatorio', error.message ?? 'Nao foi possivel salvar os dados no Firestore.');
+      Alert.alert(
+        'Erro ao salvar relatorio',
+        error.message ?? 'Nao foi possivel salvar os dados no Firestore.',
+      );
     } finally {
       setLoading(false);
     }
@@ -102,7 +107,10 @@ const GroupMatchReportScreen = ({ onBack }: GroupMatchReportScreenProps) => {
         Alert.alert('Sem partidas', 'Nao ha partidas registradas para esse grupo ainda.');
       }
     } catch (error: any) {
-      Alert.alert('Erro ao carregar relatorio', error.message ?? 'Nao foi possivel recuperar os dados salvos.');
+      Alert.alert(
+        'Erro ao carregar relatorio',
+        error.message ?? 'Nao foi possivel recuperar os dados salvos.',
+      );
     } finally {
       setLoading(false);
     }
@@ -114,7 +122,7 @@ const GroupMatchReportScreen = ({ onBack }: GroupMatchReportScreenProps) => {
     value: string,
   ) => {
     const numericValue = Math.max(0, Number(value.replace(/\D/g, '')) || 0);
-    setEditablePlayers(prev =>
+    setEditablePlayers((prev) =>
       prev.map((player, playerIndex) =>
         playerIndex === index
           ? {
@@ -133,7 +141,10 @@ const GroupMatchReportScreen = ({ onBack }: GroupMatchReportScreenProps) => {
     }
 
     if (!isAdmin) {
-      Alert.alert('Permissao negada', 'Apenas administradores podem editar estatisticas manualmente.');
+      Alert.alert(
+        'Permissao negada',
+        'Apenas administradores podem editar estatisticas manualmente.',
+      );
       return;
     }
 
@@ -147,9 +158,15 @@ const GroupMatchReportScreen = ({ onBack }: GroupMatchReportScreenProps) => {
       const updatedReport = await updateGroupMatchReportManual(normalizedGroupId, editablePlayers);
       setReport(updatedReport);
       setEditablePlayers(updatedReport.players);
-      Alert.alert('Estatisticas atualizadas', 'Alteracoes manuais salvas no Firestore com permissao de admin.');
+      Alert.alert(
+        'Estatisticas atualizadas',
+        'Alteracoes manuais salvas no Firestore com permissao de admin.',
+      );
     } catch (error: any) {
-      Alert.alert('Erro ao salvar estatisticas', error.message ?? 'Nao foi possivel salvar as edicoes.');
+      Alert.alert(
+        'Erro ao salvar estatisticas',
+        error.message ?? 'Nao foi possivel salvar as edicoes.',
+      );
     } finally {
       setLoading(false);
     }
@@ -173,7 +190,10 @@ const GroupMatchReportScreen = ({ onBack }: GroupMatchReportScreenProps) => {
       if (error?.message?.includes('not installed')) {
         Alert.alert('WhatsApp nao encontrado', 'Instale o WhatsApp para compartilhar o relatorio.');
       } else if (error?.message !== 'User did not share') {
-        Alert.alert('Erro ao compartilhar', error.message ?? 'Nao foi possivel compartilhar o relatorio.');
+        Alert.alert(
+          'Erro ao compartilhar',
+          error.message ?? 'Nao foi possivel compartilhar o relatorio.',
+        );
       }
     }
   };
@@ -257,25 +277,40 @@ const GroupMatchReportScreen = ({ onBack }: GroupMatchReportScreenProps) => {
         {report && report.players.length > 0 ? (
           <View style={styles.playersSection}>
             <Text style={styles.playersTitle}>Desempenho por jogador</Text>
-            {report.players.map(player => (
+            {report.players.map((player) => (
               <View
                 key={player.playerName}
                 testID={`matchReportPlayerCard-${player.playerName}`}
                 style={styles.playerCard}
               >
-                <Text testID={`matchReportPlayerName-${player.playerName}`} style={styles.playerName}>
+                <Text
+                  testID={`matchReportPlayerName-${player.playerName}`}
+                  style={styles.playerName}
+                >
                   {player.playerName}
                 </Text>
-                <Text testID={`matchReportPlayerMatches-${player.playerName}`} style={styles.playerLine}>
+                <Text
+                  testID={`matchReportPlayerMatches-${player.playerName}`}
+                  style={styles.playerLine}
+                >
                   Jogos: {player.matches}
                 </Text>
-                <Text testID={`matchReportPlayerWins-${player.playerName}`} style={styles.playerLine}>
+                <Text
+                  testID={`matchReportPlayerWins-${player.playerName}`}
+                  style={styles.playerLine}
+                >
                   Vitorias: {player.wins}
                 </Text>
-                <Text testID={`matchReportPlayerLosses-${player.playerName}`} style={styles.playerLine}>
+                <Text
+                  testID={`matchReportPlayerLosses-${player.playerName}`}
+                  style={styles.playerLine}
+                >
                   Derrotas: {player.losses}
                 </Text>
-                <Text testID={`matchReportPlayerGoals-${player.playerName}`} style={styles.playerGoals}>
+                <Text
+                  testID={`matchReportPlayerGoals-${player.playerName}`}
+                  style={styles.playerGoals}
+                >
                   Gols: {player.goals}
                 </Text>
               </View>
@@ -292,28 +327,28 @@ const GroupMatchReportScreen = ({ onBack }: GroupMatchReportScreenProps) => {
                 <View style={styles.editInputsRow}>
                   <TextInput
                     value={`${player.matches}`}
-                    onChangeText={value => handleChangePlayerStat(index, 'matches', value)}
+                    onChangeText={(value) => handleChangePlayerStat(index, 'matches', value)}
                     keyboardType="number-pad"
                     style={styles.editInput}
                     placeholder="Jogos"
                   />
                   <TextInput
                     value={`${player.goals}`}
-                    onChangeText={value => handleChangePlayerStat(index, 'goals', value)}
+                    onChangeText={(value) => handleChangePlayerStat(index, 'goals', value)}
                     keyboardType="number-pad"
                     style={styles.editInput}
                     placeholder="Gols"
                   />
                   <TextInput
                     value={`${player.wins}`}
-                    onChangeText={value => handleChangePlayerStat(index, 'wins', value)}
+                    onChangeText={(value) => handleChangePlayerStat(index, 'wins', value)}
                     keyboardType="number-pad"
                     style={styles.editInput}
                     placeholder="Vitorias"
                   />
                   <TextInput
                     value={`${player.losses}`}
-                    onChangeText={value => handleChangePlayerStat(index, 'losses', value)}
+                    onChangeText={(value) => handleChangePlayerStat(index, 'losses', value)}
                     keyboardType="number-pad"
                     style={styles.editInput}
                     placeholder="Derrotas"
@@ -328,7 +363,9 @@ const GroupMatchReportScreen = ({ onBack }: GroupMatchReportScreenProps) => {
               onPress={handleSaveManualStats}
               disabled={loading}
             >
-              <Text style={styles.manualSaveButtonText}>{loading ? 'Salvando...' : 'Salvar edicao manual'}</Text>
+              <Text style={styles.manualSaveButtonText}>
+                {loading ? 'Salvando...' : 'Salvar edicao manual'}
+              </Text>
             </Pressable>
           </View>
         ) : null}

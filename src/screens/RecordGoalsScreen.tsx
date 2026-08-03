@@ -63,10 +63,10 @@ const RecordGoalsScreen = ({ onBack }: RecordGoalsScreenProps) => {
       setEventData(event);
       setResult(event.result ?? initialResult);
       const draft: Record<string, TeamId> = {};
-      event.lineup.teamA.forEach(playerName => {
+      event.lineup.teamA.forEach((playerName) => {
         draft[playerName] = 'A';
       });
-      event.lineup.teamB.forEach(playerName => {
+      event.lineup.teamB.forEach((playerName) => {
         draft[playerName] = 'B';
       });
       setLineupDraft(draft);
@@ -94,10 +94,10 @@ const RecordGoalsScreen = ({ onBack }: RecordGoalsScreenProps) => {
       setResult(event.result ?? initialResult);
 
       const draft: Record<string, TeamId> = {};
-      event.lineup.teamA.forEach(playerName => {
+      event.lineup.teamA.forEach((playerName) => {
         draft[playerName] = 'A';
       });
-      event.lineup.teamB.forEach(playerName => {
+      event.lineup.teamB.forEach((playerName) => {
         draft[playerName] = 'B';
       });
       setLineupDraft(draft);
@@ -129,7 +129,7 @@ const RecordGoalsScreen = ({ onBack }: RecordGoalsScreenProps) => {
   };
 
   const handleDraftAssign = (playerName: string, teamId: TeamId) => {
-    setLineupDraft(prev => ({
+    setLineupDraft((prev) => ({
       ...prev,
       [playerName]: teamId,
     }));
@@ -142,8 +142,8 @@ const RecordGoalsScreen = ({ onBack }: RecordGoalsScreenProps) => {
     }
 
     const allPlayers = eventData.participants;
-    const teamA = allPlayers.filter(playerName => lineupDraft[playerName] === 'A');
-    const teamB = allPlayers.filter(playerName => lineupDraft[playerName] === 'B');
+    const teamA = allPlayers.filter((playerName) => lineupDraft[playerName] === 'A');
+    const teamB = allPlayers.filter((playerName) => lineupDraft[playerName] === 'B');
 
     setSavingLineup(true);
     try {
@@ -152,7 +152,10 @@ const RecordGoalsScreen = ({ onBack }: RecordGoalsScreenProps) => {
       setEventData(refreshed);
       Alert.alert('Escalação atualizada', 'Permissão validada e escalação salva no Firestore.');
     } catch (error: any) {
-      Alert.alert('Erro ao atualizar escalação', error.message ?? 'Nao foi possivel salvar a escalação.');
+      Alert.alert(
+        'Erro ao atualizar escalação',
+        error.message ?? 'Nao foi possivel salvar a escalação.',
+      );
     } finally {
       setSavingLineup(false);
     }
@@ -189,7 +192,10 @@ const RecordGoalsScreen = ({ onBack }: RecordGoalsScreenProps) => {
       const refreshed = await getGameEventById(eventData.id);
       setEventData(refreshed);
 
-      Alert.alert('Gol registrado', `Placar atualizado: Time A ${updated.result.teamA} x ${updated.result.teamB} Time B`);
+      Alert.alert(
+        'Gol registrado',
+        `Placar atualizado: Time A ${updated.result.teamA} x ${updated.result.teamB} Time B`,
+      );
     } catch (error: any) {
       Alert.alert('Erro ao registrar gol', error.message ?? 'Nao foi possivel salvar o gol.');
     } finally {
@@ -215,7 +221,9 @@ const RecordGoalsScreen = ({ onBack }: RecordGoalsScreenProps) => {
             <Text style={styles.title}>Registrar gols</Text>
           </View>
 
-          <Text style={styles.subtitle}>Registre gols durante ou após o jogo e salve o resultado automaticamente.</Text>
+          <Text style={styles.subtitle}>
+            Registre gols durante ou após o jogo e salve o resultado automaticamente.
+          </Text>
         </View>
 
         <Text style={styles.label}>ID do grupo</Text>
@@ -235,7 +243,9 @@ const RecordGoalsScreen = ({ onBack }: RecordGoalsScreenProps) => {
             onPress={handleLoadLatestEventByGroup}
             disabled={loadingEvent || savingGoal || savingLineup}
           >
-            <Text style={styles.loadButtonText}>{loadingEvent ? 'Carregando...' : 'Ultimo evento'}</Text>
+            <Text style={styles.loadButtonText}>
+              {loadingEvent ? 'Carregando...' : 'Ultimo evento'}
+            </Text>
           </Pressable>
         </View>
 
@@ -264,9 +274,15 @@ const RecordGoalsScreen = ({ onBack }: RecordGoalsScreenProps) => {
           <View style={styles.eventCard}>
             <Text style={styles.eventTitle}>Evento: {eventData.location}</Text>
             <Text style={styles.eventMeta}>Grupo: {eventData.groupId}</Text>
-            <Text style={styles.eventMeta}>Data: {eventData.date} - Horario: {eventData.time}</Text>
-            <Text style={styles.eventMeta}>Time A: {eventData.lineup.teamA.join(', ') || 'Sem jogadores'}</Text>
-            <Text style={styles.eventMeta}>Time B: {eventData.lineup.teamB.join(', ') || 'Sem jogadores'}</Text>
+            <Text style={styles.eventMeta}>
+              Data: {eventData.date} - Horario: {eventData.time}
+            </Text>
+            <Text style={styles.eventMeta}>
+              Time A: {eventData.lineup.teamA.join(', ') || 'Sem jogadores'}
+            </Text>
+            <Text style={styles.eventMeta}>
+              Time B: {eventData.lineup.teamB.join(', ') || 'Sem jogadores'}
+            </Text>
           </View>
         ) : null}
 
@@ -277,7 +293,7 @@ const RecordGoalsScreen = ({ onBack }: RecordGoalsScreenProps) => {
               A permissão de administrador do grupo e validada antes de salvar.
             </Text>
             <View style={styles.lineupPlayersList}>
-              {eventData.participants.map(playerName => (
+              {eventData.participants.map((playerName) => (
                 <View key={playerName} style={styles.lineupPlayerRow}>
                   <Text style={styles.lineupPlayerName}>{playerName}</Text>
                   <View style={styles.lineupButtonsRow}>
@@ -309,14 +325,18 @@ const RecordGoalsScreen = ({ onBack }: RecordGoalsScreenProps) => {
               onPress={handleSaveLineup}
               disabled={savingLineup}
             >
-              <Text style={styles.saveButtonText}>{savingLineup ? 'Salvando...' : 'Salvar escalação'}</Text>
+              <Text style={styles.saveButtonText}>
+                {savingLineup ? 'Salvando...' : 'Salvar escalação'}
+              </Text>
             </Pressable>
           </View>
         ) : null}
 
         <View style={styles.scoreCard}>
           <Text style={styles.scoreTitle}>Resultado automatico</Text>
-          <Text testID="resultScoreText" style={styles.scoreText}>Time A {result.teamA} x {result.teamB} Time B</Text>
+          <Text testID="resultScoreText" style={styles.scoreText}>
+            Time A {result.teamA} x {result.teamB} Time B
+          </Text>
           <Text style={styles.winnerText}>{winnerText}</Text>
         </View>
 
@@ -334,7 +354,7 @@ const RecordGoalsScreen = ({ onBack }: RecordGoalsScreenProps) => {
           <View style={styles.playersCard}>
             <Text style={styles.playersTitle}>Selecionar jogador da escalacao</Text>
             <View style={styles.playersList}>
-              {availablePlayers.map(playerName => (
+              {availablePlayers.map((playerName) => (
                 <Pressable
                   key={playerName}
                   style={[styles.playerChip, player === playerName && styles.playerChipActive]}
