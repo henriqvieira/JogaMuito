@@ -1,19 +1,6 @@
-const E2E_EMAIL = process.env.E2E_EMAIL ?? 'usuario@email.com';
-const E2E_PASSWORD = process.env.E2E_PASSWORD ?? '123456';
+import { createGroupFromHome, dismissOkAlertIfVisible, E2E_EMAIL, E2E_PASSWORD } from './helpers';
+
 const E2E_GROUP_ID = process.env.E2E_GROUP_ID;
-
-const dismissOkAlertIfVisible = async () => {
-  try {
-    await waitFor(element(by.text('OK')))
-      .toBeVisible()
-      .withTimeout(3000);
-    await element(by.text('OK')).tap();
-  } catch (error) {
-    return Boolean(error);
-  }
-
-  return true;
-};
 
 describe('Finance flow', () => {
   beforeAll(async () => {
@@ -25,11 +12,7 @@ describe('Finance flow', () => {
   });
 
   it('should create match cost, apply exemption and display financial history totals', async () => {
-    if (!E2E_GROUP_ID) {
-      throw new Error(
-        'E2E_GROUP_ID nao definido. Configure um grupo onde o usuario de teste seja admin.',
-      );
-    }
+    const suffix = Date.now().toString().slice(-6);
 
     await expect(element(by.id('emailInput'))).toBeVisible();
     await element(by.id('emailInput')).replaceText(E2E_EMAIL);
@@ -38,10 +21,13 @@ describe('Finance flow', () => {
 
     await expect(element(by.id('homeTitle'))).toBeVisible();
 
+    const groupId =
+      E2E_GROUP_ID ?? (await createGroupFromHome(`Grupo Financas E2E ${suffix}`)).groupId;
+
     await element(by.id('manageMatchCostsButton')).tap();
     await expect(element(by.id('matchCostGroupIdInput'))).toBeVisible();
 
-    await element(by.id('matchCostGroupIdInput')).replaceText(E2E_GROUP_ID);
+    await element(by.id('matchCostGroupIdInput')).replaceText(groupId);
     await element(by.id('matchCostTotalAmountInput')).replaceText('120');
 
     await element(by.id('matchCostPlayerInput')).replaceText('Ana');
@@ -69,7 +55,7 @@ describe('Finance flow', () => {
     await element(by.id('financialHistoryButton')).tap();
     await expect(element(by.id('financialHistoryGroupIdInput'))).toBeVisible();
 
-    await element(by.id('financialHistoryGroupIdInput')).replaceText(E2E_GROUP_ID);
+    await element(by.id('financialHistoryGroupIdInput')).replaceText(groupId);
     await element(by.id('loadFinancialHistoryButton')).tap();
     await dismissOkAlertIfVisible();
 

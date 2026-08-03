@@ -1,18 +1,6 @@
-const E2E_EMAIL = process.env.E2E_EMAIL ?? 'usuario@email.com';
-const E2E_PASSWORD = process.env.E2E_PASSWORD ?? '123456';
-const E2E_GROUP_ID = process.env.E2E_GROUP_ID;
+import { createGroupFromHome, dismissOkAlertIfVisible, E2E_EMAIL, E2E_PASSWORD } from './helpers';
 
-const dismissOkAlertIfVisible = async () => {
-  try {
-    await waitFor(element(by.text('OK')))
-      .toBeVisible()
-      .withTimeout(3000);
-    await element(by.text('OK')).tap();
-    return true;
-  } catch {
-    return false;
-  }
-};
+const E2E_GROUP_ID = process.env.E2E_GROUP_ID;
 
 const handleWhatsappShareResult = async () => {
   try {
@@ -23,9 +11,10 @@ const handleWhatsappShareResult = async () => {
     await dismissOkAlertIfVisible();
     return;
   } catch {
-    // If WhatsApp is installed, the app may be backgrounded while opening WhatsApp.
-    // Press back to return to the app and continue assertions.
-    await device.pressBack();
+    // On Android, WhatsApp may background the app. On iOS, share sheet might stay in-app.
+    if (device.getPlatform() === 'android') {
+      await device.launchApp({ newInstance: false });
+    }
   }
 };
 
@@ -39,12 +28,6 @@ describe('Reports flow', () => {
   });
 
   it('should create match, register goal, generate stats and share report on WhatsApp', async () => {
-    if (!E2E_GROUP_ID) {
-      throw new Error(
-        'E2E_GROUP_ID nao definido. Configure um grupo onde o usuario de teste seja admin.',
-      );
-    }
-
     const suffix = Date.now().toString().slice(-6);
     const eventLocation = `Quadra Relatorio E2E ${suffix}`;
 
@@ -55,10 +38,13 @@ describe('Reports flow', () => {
 
     await expect(element(by.id('homeTitle'))).toBeVisible();
 
+    const groupId =
+      E2E_GROUP_ID ?? (await createGroupFromHome(`Grupo Relatorio E2E ${suffix}`)).groupId;
+
     await element(by.id('createGameEventButton')).tap();
     await expect(element(by.id('eventGroupIdInput'))).toBeVisible();
 
-    await element(by.id('eventGroupIdInput')).replaceText(E2E_GROUP_ID);
+    await element(by.id('eventGroupIdInput')).replaceText(groupId);
     await element(by.id('eventDateInput')).replaceText('2026-12-20');
     await element(by.id('eventTimeInput')).replaceText('20:00');
     await element(by.id('eventLocationInput')).replaceText(eventLocation);
@@ -79,7 +65,7 @@ describe('Reports flow', () => {
     await element(by.id('recordGoalsButton')).tap();
     await expect(element(by.id('loadLatestEventGroupIdInput'))).toBeVisible();
 
-    await element(by.id('loadLatestEventGroupIdInput')).replaceText(E2E_GROUP_ID);
+    await element(by.id('loadLatestEventGroupIdInput')).replaceText(groupId);
     await element(by.id('loadLatestEventButton')).tap();
     await dismissOkAlertIfVisible();
 
@@ -103,7 +89,7 @@ describe('Reports flow', () => {
     await element(by.id('groupMatchReportButton')).tap();
     await expect(element(by.id('matchReportGroupIdInput'))).toBeVisible();
 
-    await element(by.id('matchReportGroupIdInput')).replaceText(E2E_GROUP_ID);
+    await element(by.id('matchReportGroupIdInput')).replaceText(groupId);
     await element(by.id('saveMatchReportButton')).tap();
     await dismissOkAlertIfVisible();
 
