@@ -1,12 +1,17 @@
 import { addGroup, createGroupInvite, validateGroupData } from './groupService';
 
 jest.mock('firebase/firestore', () => {
-  const original = jest.requireActual('firebase/firestore');
   return {
-    ...original,
     addDoc: jest.fn(() => Promise.resolve({ id: 'group123' })),
+    arrayUnion: jest.fn((value: string) => value),
     collection: jest.fn(),
+    doc: jest.fn(),
+    getDoc: jest.fn(),
+    getDocs: jest.fn(),
+    query: jest.fn(),
     serverTimestamp: jest.fn(() => ({ _seconds: 0, _nanoseconds: 0 })),
+    updateDoc: jest.fn(),
+    where: jest.fn(),
   };
 });
 
