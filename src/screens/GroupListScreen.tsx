@@ -39,7 +39,9 @@ const GroupListScreen = ({ onLogout, onBack }: GroupListScreenProps) => {
   const [isPublic, setIsPublic] = useState(true);
   const [loading, setLoading] = useState(false);
   const [adminModalVisible, setAdminModalVisible] = useState(false);
-  const [adminAction, setAdminAction] = useState<'edit' | 'createEvent' | 'exemptPayment' | null>(null);
+  const [adminAction, setAdminAction] = useState<'edit' | 'createEvent' | 'exemptPayment' | null>(
+    null,
+  );
   const [selectedGroup, setSelectedGroup] = useState<GameGroup | null>(null);
   const [adminInputName, setAdminInputName] = useState('');
   const [adminInputDescription, setAdminInputDescription] = useState('');
@@ -49,8 +51,8 @@ const GroupListScreen = ({ onLogout, onBack }: GroupListScreenProps) => {
 
   useEffect(() => {
     const unsubscribe = subscribeToGroups(
-      fetchedGroups => setGroups(fetchedGroups),
-      error => {
+      (fetchedGroups) => setGroups(fetchedGroups),
+      (error) => {
         Alert.alert('Erro ao carregar grupos', error.message);
       },
     );
@@ -84,7 +86,7 @@ const GroupListScreen = ({ onLogout, onBack }: GroupListScreenProps) => {
         paymentExemptions: [],
       };
 
-      setGroups(prev => [newGroup, ...prev]);
+      setGroups((prev) => [newGroup, ...prev]);
       setName('');
       setDescription('');
       setIsPublic(true);
@@ -98,13 +100,16 @@ const GroupListScreen = ({ onLogout, onBack }: GroupListScreenProps) => {
 
   const handleGenerateInvite = async (group: GameGroup) => {
     if (!isGroupAdmin(group)) {
-      Alert.alert('Permissão negada', 'Apenas administradores podem gerar convites para este grupo.');
+      Alert.alert(
+        'Permissão negada',
+        'Apenas administradores podem gerar convites para este grupo.',
+      );
       return;
     }
 
     try {
       const inviteUrl = await createGroupInvite(group.id);
-      setInviteLinks(prev => ({ ...prev, [group.id]: inviteUrl }));
+      setInviteLinks((prev) => ({ ...prev, [group.id]: inviteUrl }));
       Alert.alert('Convite gerado', 'O link de convite foi criado com sucesso.');
     } catch (error: any) {
       Alert.alert('Erro ao gerar convite', error.message ?? 'Tente novamente.');
@@ -144,7 +149,8 @@ const GroupListScreen = ({ onLogout, onBack }: GroupListScreenProps) => {
   };
 
   const currentUserId = getCurrentUserId();
-  const isGroupAdmin = (group: GameGroup) => !!currentUserId && (group.admins ?? []).includes(currentUserId);
+  const isGroupAdmin = (group: GameGroup) =>
+    !!currentUserId && (group.admins ?? []).includes(currentUserId);
 
   const openAdminAction = (group: GameGroup, action: 'edit' | 'createEvent' | 'exemptPayment') => {
     setSelectedGroup(group);
@@ -242,13 +248,25 @@ const GroupListScreen = ({ onLogout, onBack }: GroupListScreenProps) => {
       </Pressable>
       {isGroupAdmin(item) ? (
         <View style={styles.adminActionsRow}>
-          <Pressable testID={`editGroupButton-${item.id}`} style={styles.adminActionButton} onPress={() => openAdminAction(item, 'edit')}>
+          <Pressable
+            testID={`editGroupButton-${item.id}`}
+            style={styles.adminActionButton}
+            onPress={() => openAdminAction(item, 'edit')}
+          >
             <Text style={styles.adminActionText}>Editar grupo</Text>
           </Pressable>
-          <Pressable testID={`createEventButton-${item.id}`} style={styles.adminActionButton} onPress={() => openAdminAction(item, 'createEvent')}>
+          <Pressable
+            testID={`createEventButton-${item.id}`}
+            style={styles.adminActionButton}
+            onPress={() => openAdminAction(item, 'createEvent')}
+          >
             <Text style={styles.adminActionText}>Criar evento</Text>
           </Pressable>
-          <Pressable testID={`exemptPaymentButton-${item.id}`} style={styles.adminActionButton} onPress={() => openAdminAction(item, 'exemptPayment')}>
+          <Pressable
+            testID={`exemptPaymentButton-${item.id}`}
+            style={styles.adminActionButton}
+            onPress={() => openAdminAction(item, 'exemptPayment')}
+          >
             <Text style={styles.adminActionText}>Isentar pagamento</Text>
           </Pressable>
         </View>
@@ -324,7 +342,7 @@ const GroupListScreen = ({ onLogout, onBack }: GroupListScreenProps) => {
 
         <FlatList
           data={groups}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           renderItem={renderGroupItem}
           ListEmptyComponent={<Text style={styles.emptyText}>Nenhum grupo encontrado ainda.</Text>}
           contentContainerStyle={styles.listContainer}
@@ -356,7 +374,9 @@ const GroupListScreen = ({ onLogout, onBack }: GroupListScreenProps) => {
                   <TextInput
                     value={adminInputDescription}
                     onChangeText={setAdminInputDescription}
-                    placeholder={adminAction === 'edit' ? 'Descrição do grupo' : 'Descrição do evento'}
+                    placeholder={
+                      adminAction === 'edit' ? 'Descrição do grupo' : 'Descrição do evento'
+                    }
                     style={[styles.input, styles.textArea]}
                     multiline
                     numberOfLines={3}

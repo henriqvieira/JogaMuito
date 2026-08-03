@@ -77,27 +77,18 @@ describe('calculateMatchCostSummary', () => {
 
   it('deve falhar quando valor total nao for informado', () => {
     expect(() =>
-      calculateMatchCostSummary(Number.NaN, [
-        { name: 'Ana' },
-        { name: 'Bruno' },
-      ]),
+      calculateMatchCostSummary(Number.NaN, [{ name: 'Ana' }, { name: 'Bruno' }]),
     ).toThrow('Informe um valor total valido para a partida.');
   });
 
   it('deve falhar quando valor total for zero ou negativo', () => {
-    expect(() =>
-      calculateMatchCostSummary(0, [
-        { name: 'Ana' },
-        { name: 'Bruno' },
-      ]),
-    ).toThrow('Informe um valor total valido para a partida.');
+    expect(() => calculateMatchCostSummary(0, [{ name: 'Ana' }, { name: 'Bruno' }])).toThrow(
+      'Informe um valor total valido para a partida.',
+    );
 
-    expect(() =>
-      calculateMatchCostSummary(-50, [
-        { name: 'Ana' },
-        { name: 'Bruno' },
-      ]),
-    ).toThrow('Informe um valor total valido para a partida.');
+    expect(() => calculateMatchCostSummary(-50, [{ name: 'Ana' }, { name: 'Bruno' }])).toThrow(
+      'Informe um valor total valido para a partida.',
+    );
   });
 
   it('deve falhar quando nao houver jogadores', () => {
@@ -116,11 +107,8 @@ describe('calculateMatchCostSummary', () => {
   });
 
   it('deve falhar quando houver jogadores duplicados', () => {
-    expect(() =>
-      calculateMatchCostSummary(100, [
-        { name: 'Ana' },
-        { name: 'ana' },
-      ]),
-    ).toThrow('Existem jogadores duplicados na lista.');
+    expect(() => calculateMatchCostSummary(100, [{ name: 'Ana' }, { name: 'ana' }])).toThrow(
+      'Existem jogadores duplicados na lista.',
+    );
   });
 });

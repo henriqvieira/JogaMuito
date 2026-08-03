@@ -61,7 +61,9 @@ jest.mock('firebase/firestore', () => {
         data: () => data,
       }));
 
-      const whereFilters = (queryRef?.constraints ?? []).filter((constraint: any) => constraint.type === 'where');
+      const whereFilters = (queryRef?.constraints ?? []).filter(
+        (constraint: any) => constraint.type === 'where',
+      );
 
       whereFilters.forEach((filter: any) => {
         docs = docs.filter((docSnapshot: any) => {
@@ -222,7 +224,9 @@ describe('eventService', () => {
             teamB: ['Bruno'],
           },
         }),
-      ).rejects.toThrow('Permissão negada: apenas administradores do grupo podem salvar alterações.');
+      ).rejects.toThrow(
+        'Permissão negada: apenas administradores do grupo podem salvar alterações.',
+      );
     });
 
     it('deve falhar ao criar evento sem data', async () => {
@@ -503,7 +507,9 @@ describe('eventService', () => {
             goals: 1,
           },
         ]),
-      ).rejects.toThrow('Permissão negada: apenas administradores do grupo podem salvar alterações.');
+      ).rejects.toThrow(
+        'Permissão negada: apenas administradores do grupo podem salvar alterações.',
+      );
     });
   });
 });

@@ -23,21 +23,24 @@ const SocialAuthButtons = ({
       <Pressable
         style={[styles.button, styles.googleButton]}
         onPress={onGooglePress}
-        disabled={disabled || loading === 'google'}>
+        disabled={disabled || loading === 'google'}
+      >
         <Text style={styles.buttonText}>{loading === 'google' ? 'Entrando...' : 'Google'}</Text>
       </Pressable>
 
       <Pressable
         style={[styles.button, styles.facebookButton]}
         onPress={onFacebookPress}
-        disabled={disabled || loading === 'facebook'}>
+        disabled={disabled || loading === 'facebook'}
+      >
         <Text style={styles.buttonText}>{loading === 'facebook' ? 'Entrando...' : 'Facebook'}</Text>
       </Pressable>
 
       <Pressable
         style={[styles.button, styles.appleButton]}
         onPress={onApplePress}
-        disabled={disabled || loading === 'apple'}>
+        disabled={disabled || loading === 'apple'}
+      >
         <Text style={styles.buttonText}>{loading === 'apple' ? 'Entrando...' : 'Apple'}</Text>
       </Pressable>
     </View>

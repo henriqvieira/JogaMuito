@@ -40,7 +40,9 @@ describe('Reports flow', () => {
 
   it('should create match, register goal, generate stats and share report on WhatsApp', async () => {
     if (!E2E_GROUP_ID) {
-      throw new Error('E2E_GROUP_ID nao definido. Configure um grupo onde o usuario de teste seja admin.');
+      throw new Error(
+        'E2E_GROUP_ID nao definido. Configure um grupo onde o usuario de teste seja admin.',
+      );
     }
 
     const suffix = Date.now().toString().slice(-6);
@@ -81,7 +83,9 @@ describe('Reports flow', () => {
     await element(by.id('loadLatestEventButton')).tap();
     await dismissOkAlertIfVisible();
 
-    await waitFor(element(by.text(`Evento: ${eventLocation}`))).toBeVisible().withTimeout(10000);
+    await waitFor(element(by.text(`Evento: ${eventLocation}`)))
+      .toBeVisible()
+      .withTimeout(10000);
 
     await element(by.text('Ana')).atIndex(0).tap();
     await element(by.id('goalTeamAButton')).tap();
@@ -89,7 +93,9 @@ describe('Reports flow', () => {
     await element(by.id('registerGoalButton')).tap();
     await dismissOkAlertIfVisible();
 
-    await waitFor(element(by.id('resultScoreText'))).toHaveText('Time A 1 x 0 Time B').withTimeout(10000);
+    await waitFor(element(by.id('resultScoreText')))
+      .toHaveText('Time A 1 x 0 Time B')
+      .withTimeout(10000);
 
     await element(by.text('Voltar')).atIndex(0).tap();
     await expect(element(by.id('homeTitle'))).toBeVisible();

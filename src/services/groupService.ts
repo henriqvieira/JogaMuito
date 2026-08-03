@@ -131,7 +131,11 @@ export const createGroupInvite = async (groupId: string) => {
 };
 
 const findInviteByCode = async (code: string) => {
-  const inviteQuery = query(invitesCollection, where('code', '==', code), where('valid', '==', true));
+  const inviteQuery = query(
+    invitesCollection,
+    where('code', '==', code),
+    where('valid', '==', true),
+  );
   const snapshot = await getDocs(inviteQuery);
 
   if (snapshot.empty) {
@@ -154,7 +158,7 @@ export const acceptInviteWithCode = async (inviteText: string) => {
 
   const parsed = parseInviteValue(inviteText);
   let groupId = parsed.value;
-  let requiresInvite = parsed.type === 'invite';
+  const requiresInvite = parsed.type === 'invite';
 
   if (parsed.type === 'invite') {
     const invite = await findInviteByCode(parsed.value);
@@ -229,7 +233,7 @@ export const subscribeToGroups = (
       }
 
       const groups = snapshot.docs
-        .map(docSnapshot => {
+        .map((docSnapshot) => {
           const data = docSnapshot.data() as DocumentData;
           return {
             id: docSnapshot.id,

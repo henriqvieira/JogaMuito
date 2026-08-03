@@ -33,7 +33,10 @@ const AcceptInviteScreen = ({ onBack }: AcceptInviteScreenProps) => {
       setInviteText('');
       onBack();
     } catch (error: any) {
-      Alert.alert('Falha ao aceitar convite', error.message ?? 'Verifique o convite e tente novamente.');
+      Alert.alert(
+        'Falha ao aceitar convite',
+        error.message ?? 'Verifique o convite e tente novamente.',
+      );
     } finally {
       setLoading(false);
     }

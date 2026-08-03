@@ -38,11 +38,15 @@ function runCommand(command, commandArgs, options = {}) {
 
   const command = process.platform === 'win32' ? process.execPath : process.execPath;
   const cliPath = require.resolve('react-native/cli.js');
-  const child = spawn(command, [cliPath, 'start', '--reset-cache', '--host', '0.0.0.0', '--port', '8081', ...args], {
-    stdio: 'inherit',
-    shell: false,
-    env,
-  });
+  const child = spawn(
+    command,
+    [cliPath, 'start', '--reset-cache', '--host', '0.0.0.0', '--port', '8081', ...args],
+    {
+      stdio: 'inherit',
+      shell: false,
+      env,
+    },
+  );
 
   child.on('exit', (code) => {
     process.exit(code ?? 0);
