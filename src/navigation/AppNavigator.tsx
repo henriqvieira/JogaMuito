@@ -16,7 +16,6 @@ const AppNavigator = () => {
         await saveAuthSession({
           uid: user.uid,
           email: user.email,
-          token: await user.getIdToken(),
         });
         setIsAuthenticated(true);
         setScreen('home');

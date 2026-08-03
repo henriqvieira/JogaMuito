@@ -81,6 +81,7 @@ import com.android.build.OutputFile
 
 project.ext.react = [
     enableHermes: false,  // clean and rebuild if changing
+    nodeExecutableAndArgs: ["node", "--openssl-legacy-provider"],
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
@@ -129,13 +130,14 @@ def nativeArchitectures = project.getProperties().get("reactNativeDebugArchitect
 
 android {
     ndkVersion "21.4.7075529"
+    namespace "com.jogamuito"
 
-    compileSdkVersion 30
+    compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
         applicationId "com.jogamuito"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
     }
@@ -154,6 +156,17 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            if (project.hasProperty('JOGAMUITO_UPLOAD_STORE_FILE') &&
+                project.hasProperty('JOGAMUITO_UPLOAD_STORE_PASSWORD') &&
+                project.hasProperty('JOGAMUITO_UPLOAD_KEY_ALIAS') &&
+                project.hasProperty('JOGAMUITO_UPLOAD_KEY_PASSWORD')) {
+                storeFile file(JOGAMUITO_UPLOAD_STORE_FILE)
+                storePassword JOGAMUITO_UPLOAD_STORE_PASSWORD
+                keyAlias JOGAMUITO_UPLOAD_KEY_ALIAS
+                keyPassword JOGAMUITO_UPLOAD_KEY_PASSWORD
+            }
+        }
     }
     buildToolsVersion '30.0.3'
     buildTypes {
@@ -166,9 +179,9 @@ android {
             }
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            if (project.hasProperty('JOGAMUITO_UPLOAD_STORE_FILE')) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }

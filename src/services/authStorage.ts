@@ -3,7 +3,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export type PersistedAuthSession = {
   uid: string;
   email?: string | null;
-  token?: string | null;
 };
 
 const AUTH_SESSION_KEY = '@jogamuito:auth';
