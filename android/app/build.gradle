@@ -9,6 +9,11 @@ react {
 def enableProguardInReleaseBuilds = false
 
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
+def requiredReleaseProps = ['RELEASE_STORE_FILE', 'RELEASE_STORE_PASSWORD', 'RELEASE_KEY_ALIAS', 'RELEASE_KEY_PASSWORD']
+def hasReleaseSigning = requiredReleaseProps.every { prop ->
+    project.hasProperty(prop) && project.property(prop)?.toString()?.trim()
+}
+def isReleaseTask = gradle.startParameter.taskNames.any { task -> task.toLowerCase().contains('release') }
 
 android {
     ndkVersion rootProject.ext.ndkVersion
@@ -31,6 +36,14 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            if (hasReleaseSigning) {
+                storeFile rootProject.file(project.property('RELEASE_STORE_FILE'))
+                storePassword project.property('RELEASE_STORE_PASSWORD')
+                keyAlias project.property('RELEASE_KEY_ALIAS')
+                keyPassword project.property('RELEASE_KEY_PASSWORD')
+            }
+        }
     }
 
     buildTypes {
@@ -38,6 +51,10 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
+            if (isReleaseTask && !hasReleaseSigning) {
+                throw new GradleException("Release signing is not configured. Define RELEASE_STORE_FILE, RELEASE_STORE_PASSWORD, RELEASE_KEY_ALIAS and RELEASE_KEY_PASSWORD in android/gradle.properties.")
+            }
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }

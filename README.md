@@ -49,6 +49,12 @@ ou
 npx react-native run-ios
 ```
 
+## Release Android assinado
+
+Guia completo de assinatura e geracao do APK de release:
+
+- `docs/android-release-signing.md`
+
 ## Autenticação
 
 - Login com email e senha
