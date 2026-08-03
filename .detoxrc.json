@@ -6,12 +6,21 @@
       "device": "emulator",
       "app": "app.android",
       "build": "cd android && .\\gradlew.bat assembleDebug"
+    },
+    "ios.sim.debug": {
+      "device": "simulator",
+      "app": "app.ios.debug",
+      "build": "xcodebuild -workspace ios/JogaMuito.xcworkspace -scheme JogaMuito -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build"
     }
   },
   "apps": {
     "app.android": {
       "type": "android.apk",
       "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk"
+    },
+    "app.ios.debug": {
+      "type": "ios.app",
+      "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/JogaMuito.app"
     }
   },
   "devices": {
@@ -19,6 +28,12 @@
       "type": "android.emulator",
       "device": {
         "avdName": "Medium_Phone"
+      }
+    },
+    "simulator": {
+      "type": "ios.simulator",
+      "device": {
+        "type": "iPhone 15"
       }
     }
   }

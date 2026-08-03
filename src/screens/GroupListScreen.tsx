@@ -223,6 +223,9 @@ const GroupListScreen = ({ onLogout, onBack }: GroupListScreenProps) => {
       </View>
       <Text style={styles.groupDescription}>{item.description}</Text>
       <Text style={styles.groupMeta}>Criado por: {item.ownerId ?? 'Anônimo'}</Text>
+      <Text testID="groupIdText" style={styles.groupMeta}>
+        ID: {item.id}
+      </Text>
       <Pressable
         testID={`generateInviteButton-${item.id}`}
         style={[styles.button, styles.generateButton]}

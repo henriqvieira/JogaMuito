@@ -77,10 +77,30 @@ npm test -- --runInBand
 
 ### Testes E2E com Detox
 
+Build Android:
+
 ```bash
-npx detox build --configuration android.emu.debug
-npx detox test --configuration android.emu.debug --cleanup
+npm run detox:build:android
+npm run detox:test:android
 ```
+
+Build iOS:
+
+```bash
+npm run detox:build:ios
+npm run detox:test:ios
+```
+
+Fluxos E2E cobertos:
+
+- login e cadastro
+- criacao de grupo
+- geracao/aceite de convite
+- criacao de evento
+- escalacao de times
+- registro de gols
+- fluxo financeiro
+- relatorios e compartilhamento
 
 ## Grupos e convites
 
