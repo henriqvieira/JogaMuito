@@ -1,5 +1,5 @@
 import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, initializeFirestore } from 'firebase/firestore';
 import {
   AuthCredential,
   createUserWithEmailAndPassword,
@@ -46,6 +46,12 @@ if (!getApps().length) {
 }
 
 export const auth = getAuth(app);
+
+// In React Native, force long polling to avoid Firestore transport issues.
+initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+});
+
 export const db = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
 export const facebookProvider = new FacebookAuthProvider();
