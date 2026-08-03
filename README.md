@@ -55,6 +55,12 @@ Guia completo de assinatura e geracao do APK de release:
 
 - `docs/android-release-signing.md`
 
+## Release iOS e App Store Connect
+
+Guia completo para configurar Firebase no iOS, gerar archive no Xcode e enviar para App Store Connect:
+
+- `docs/ios-release-appstore.md`
+
 ## Autenticação
 
 - Login com email e senha
