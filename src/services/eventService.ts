@@ -14,6 +14,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { auth, db } from './firebase';
+import { FIRESTORE_COLLECTIONS } from './firestoreSchema';
 
 export type TeamId = 'A' | 'B';
 
@@ -83,11 +84,11 @@ export type ManualPlayerStatsInput = {
   goals: number;
 };
 
-const eventsCollection = collection(db, 'gameEvents');
+const eventsCollection = collection(db, FIRESTORE_COLLECTIONS.gameEvents);
 
 const isValidDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value);
 const isValidTime = (value: string) => /^\d{2}:\d{2}$/.test(value);
-const groupsCollection = collection(db, 'groups');
+const groupsCollection = collection(db, FIRESTORE_COLLECTIONS.groups);
 
 const normalizeLineup = (lineup: { teamA: string[]; teamB: string[] }) => ({
   teamA: lineup.teamA.map((player) => player.trim()).filter(Boolean),
@@ -204,7 +205,7 @@ export const createGameEvent = async (event: CreateGameEventInput) => {
 };
 
 export const getGameEventById = async (eventId: string) => {
-  const eventRef = doc(db, 'gameEvents', eventId.trim());
+  const eventRef = doc(db, FIRESTORE_COLLECTIONS.gameEvents, eventId.trim());
   const snapshot = await getDoc(eventRef);
 
   if (!snapshot.exists()) {
@@ -467,7 +468,7 @@ export const updateGroupMatchReportManual = async (
     }),
   };
 
-  const reportRef = doc(db, 'groupMatchReports', normalizedGroupId);
+  const reportRef = doc(db, FIRESTORE_COLLECTIONS.groupMatchReports, normalizedGroupId);
   await setDoc(reportRef, {
     ...report,
     updatedAt: serverTimestamp(),
@@ -482,7 +483,7 @@ export const getSavedGroupMatchReport = async (groupId: string): Promise<GroupMa
     throw new Error('ID do grupo e obrigatorio para consultar relatorio salvo.');
   }
 
-  const reportRef = doc(db, 'groupMatchReports', normalizedGroupId);
+  const reportRef = doc(db, FIRESTORE_COLLECTIONS.groupMatchReports, normalizedGroupId);
   const snapshot = await getDoc(reportRef);
 
   if (!snapshot.exists()) {
@@ -522,7 +523,7 @@ export const updateEventLineup = async (
   eventId: string,
   lineup: { teamA: string[]; teamB: string[] },
 ) => {
-  const eventRef = doc(db, 'gameEvents', eventId.trim());
+  const eventRef = doc(db, FIRESTORE_COLLECTIONS.gameEvents, eventId.trim());
   const eventSnapshot = await getDoc(eventRef);
 
   if (!eventSnapshot.exists()) {
@@ -574,7 +575,7 @@ export const registerEventGoal = async (
     throw new Error('Minuto do gol inválido.');
   }
 
-  const eventRef = doc(db, 'gameEvents', eventId.trim());
+  const eventRef = doc(db, FIRESTORE_COLLECTIONS.gameEvents, eventId.trim());
 
   const eventSnapshot = await getDoc(eventRef);
   if (!eventSnapshot.exists()) {

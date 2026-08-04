@@ -12,6 +12,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { auth, db } from './firebase';
+import { FIRESTORE_COLLECTIONS } from './firestoreSchema';
 
 export type MatchCostPlayerInput = {
   name: string;
@@ -80,8 +81,8 @@ export type GroupFinancialHistory = {
   players: GroupFinancialHistoryPlayer[];
 };
 
-const matchCostsCollection = collection(db, 'matchCosts');
-const groupsCollection = collection(db, 'groups');
+const matchCostsCollection = collection(db, FIRESTORE_COLLECTIONS.matchCosts);
+const groupsCollection = collection(db, FIRESTORE_COLLECTIONS.groups);
 
 const roundToCents = (value: number) => Math.round(value * 100) / 100;
 
@@ -203,7 +204,7 @@ export const updateMatchCost = async (input: UpdateMatchCostInput) => {
     throw new Error('ID do custo da partida e obrigatorio.');
   }
 
-  const matchCostRef = doc(db, 'matchCosts', normalizedMatchCostId);
+  const matchCostRef = doc(db, FIRESTORE_COLLECTIONS.matchCosts, normalizedMatchCostId);
   const currentSnapshot = await getDoc(matchCostRef);
 
   if (!currentSnapshot.exists()) {
@@ -251,7 +252,7 @@ export const confirmMatchCostPayment = async (input: ConfirmMatchCostPaymentInpu
     throw new Error('Nome do jogador e obrigatorio para confirmar pagamento.');
   }
 
-  const matchCostRef = doc(db, 'matchCosts', normalizedMatchCostId);
+  const matchCostRef = doc(db, FIRESTORE_COLLECTIONS.matchCosts, normalizedMatchCostId);
   const currentSnapshot = await getDoc(matchCostRef);
 
   if (!currentSnapshot.exists()) {
