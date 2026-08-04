@@ -20,14 +20,45 @@ export type GameGroup = {
   description: string;
   isPublic: boolean;
   ownerId: string | null;
+  ownerName?: string | null;
+  displayId?: string | null;
   createdAt?: Timestamp | null;
   members?: string[];
   admins?: string[];
   paymentExemptions?: string[];
 };
 
+export type VisibleGroups = {
+  memberGroups: GameGroup[];
+  publicGroups: GameGroup[];
+};
+
 const groupsCollection = collection(db, 'groups');
 const invitesCollection = collection(db, 'groupInvites');
+
+const toTitleCase = (value: string) =>
+  value
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+
+const getNameFromEmail = (email?: string | null) => {
+  const localPart = email
+    ?.split('@')[0]
+    ?.replace(/[._-]+/g, ' ')
+    .trim();
+  return localPart ? toTitleCase(localPart) : null;
+};
+
+export const formatFriendlyGroupId = (groupId: string) => {
+  const normalized = groupId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  return `GRP-${normalized.slice(0, 6)}`;
+};
+
+export const getGroupDisplayId = (group: Pick<GameGroup, 'id' | 'displayId'>) => {
+  return group.displayId?.trim() || formatFriendlyGroupId(group.id);
+};
 
 const generateInviteCode = () =>
   Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
@@ -65,6 +96,33 @@ const parseInviteValue = (inviteText: string) => {
 };
 
 const getCurrentUserId = () => auth.currentUser?.uid ?? null;
+
+export const getCurrentUserName = () => {
+  const displayName = auth.currentUser?.displayName?.trim();
+  if (displayName) {
+    return displayName;
+  }
+
+  const emailName = getNameFromEmail(auth.currentUser?.email);
+  if (emailName) {
+    return emailName;
+  }
+
+  const userId = auth.currentUser?.uid;
+  return userId ? `Usuario ${userId.slice(0, 6)}` : 'Criador nao informado';
+};
+
+export const getGroupOwnerDisplayName = (group: GameGroup) => {
+  if (group.ownerName?.trim()) {
+    return group.ownerName.trim();
+  }
+
+  if (group.ownerId && group.ownerId === getCurrentUserId()) {
+    return getCurrentUserName();
+  }
+
+  return 'Criador nao informado';
+};
 
 export const isUserAdmin = (group: GameGroup) => {
   const userId = getCurrentUserId();
@@ -109,13 +167,20 @@ export const addGroup = async (group: {
   ownerId: string | null;
 }) => {
   validateGroupData(group);
-  return addDoc(groupsCollection, {
+  const groupRef = await addDoc(groupsCollection, {
     ...group,
+    ownerName: getCurrentUserName(),
     members: group.ownerId ? [group.ownerId] : [],
     admins: group.ownerId ? [group.ownerId] : [],
     paymentExemptions: [],
     createdAt: serverTimestamp(),
   });
+
+  await updateDoc(groupRef, {
+    displayId: formatFriendlyGroupId(groupRef.id),
+  });
+
+  return groupRef;
 };
 
 export const createGroupInvite = async (groupId: string) => {
@@ -219,6 +284,54 @@ export const exemptPlayerPayment = async (groupId: string, playerId: string) => 
   });
 };
 
+const mapGroupDoc = (docSnapshot: any): GameGroup => {
+  const data = docSnapshot.data() as DocumentData;
+
+  return {
+    id: docSnapshot.id,
+    name: data.name ?? '',
+    description: data.description ?? '',
+    isPublic: data.isPublic ?? false,
+    ownerId: data.ownerId ?? null,
+    ownerName: data.ownerName ?? null,
+    displayId: data.displayId ?? formatFriendlyGroupId(docSnapshot.id),
+    createdAt: data.createdAt ?? null,
+    members: data.members ?? [],
+    admins: data.admins ?? [],
+    paymentExemptions: data.paymentExemptions ?? [],
+  };
+};
+
+const sortGroups = (groups: GameGroup[]) => {
+  return [...groups].sort((left, right) => {
+    const leftTime = left.createdAt?.toMillis?.() ?? 0;
+    const rightTime = right.createdAt?.toMillis?.() ?? 0;
+    return rightTime - leftTime;
+  });
+};
+
+export const loadVisibleGroups = async (): Promise<VisibleGroups> => {
+  const currentUserId = getCurrentUserId();
+
+  const [memberSnapshot, publicSnapshot] = await Promise.all([
+    currentUserId
+      ? getDocs(query(groupsCollection, where('members', 'array-contains', currentUserId)))
+      : Promise.resolve(null),
+    getDocs(query(groupsCollection, where('isPublic', '==', true))),
+  ]);
+
+  const memberGroups = memberSnapshot ? memberSnapshot.docs.map(mapGroupDoc) : [];
+  const memberIds = new Set(memberGroups.map((group) => group.id));
+  const publicGroups = publicSnapshot.docs
+    .map(mapGroupDoc)
+    .filter((group) => !memberIds.has(group.id));
+
+  return {
+    memberGroups: sortGroups(memberGroups),
+    publicGroups: sortGroups(publicGroups),
+  };
+};
+
 export const subscribeToGroups = (
   callback: (groups: GameGroup[]) => void,
   errorCallback?: (error: Error) => void,
@@ -227,33 +340,12 @@ export const subscribeToGroups = (
 
   const loadGroups = async () => {
     try {
-      const snapshot = await getDocs(query(groupsCollection));
+      const visibleGroups = await loadVisibleGroups();
       if (!isActive) {
         return;
       }
 
-      const groups = snapshot.docs
-        .map((docSnapshot) => {
-          const data = docSnapshot.data() as DocumentData;
-          return {
-            id: docSnapshot.id,
-            name: data.name ?? '',
-            description: data.description ?? '',
-            isPublic: data.isPublic ?? false,
-            ownerId: data.ownerId ?? null,
-            createdAt: data.createdAt ?? null,
-            members: data.members ?? [],
-            admins: data.admins ?? [],
-            paymentExemptions: data.paymentExemptions ?? [],
-          } as GameGroup;
-        })
-        .sort((left, right) => {
-          const leftTime = left.createdAt?.toMillis?.() ?? 0;
-          const rightTime = right.createdAt?.toMillis?.() ?? 0;
-          return rightTime - leftTime;
-        });
-
-      callback(groups);
+      callback([...visibleGroups.memberGroups, ...visibleGroups.publicGroups]);
     } catch (error) {
       if (errorCallback) {
         errorCallback(error as Error);

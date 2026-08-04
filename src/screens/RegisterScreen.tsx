@@ -61,7 +61,7 @@ const RegisterScreen = ({ onRegistered, onSwitchToLogin }: RegisterScreenProps) 
     setLoading(true);
 
     try {
-      await registerWithEmailAndPassword(trimmedEmail, password);
+      await registerWithEmailAndPassword(trimmedEmail, password, trimmedName);
       onRegistered();
     } catch (error: any) {
       logFirebaseError('registerWithEmailAndPassword', error);
