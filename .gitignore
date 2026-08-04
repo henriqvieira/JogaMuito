@@ -3,6 +3,7 @@ node_modules/
 
 # Build e artefatos do React Native
 android/app/build/
+android/app/.cxx/
 android/build/
 android/.gradle/
 android/.idea/
