@@ -3,7 +3,8 @@ import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../design/theme';
 import { clearAuthSession } from '../services/authStorage';
 import { logout } from '../services/firebase';
-import GroupListScreen from './GroupListScreen';
+import CreateGroupScreen from './CreateGroupScreen';
+import ViewGroupsScreen from './ViewGroupsScreen';
 import AcceptInviteScreen from './AcceptInviteScreen';
 import CreateGameEventScreen from './CreateGameEventScreen';
 import RecordGoalsScreen from './RecordGoalsScreen';
@@ -16,7 +17,8 @@ type AuthenticatedHomeScreenProps = {
 };
 
 const AuthenticatedHomeScreen = ({ onLogout }: AuthenticatedHomeScreenProps) => {
-  const [showGroups, setShowGroups] = useState(false);
+  const [showCreateGroup, setShowCreateGroup] = useState(false);
+  const [showViewGroups, setShowViewGroups] = useState(false);
   const [showAcceptInvite, setShowAcceptInvite] = useState(false);
   const [showCreateEvent, setShowCreateEvent] = useState(false);
   const [showRecordGoals, setShowRecordGoals] = useState(false);
@@ -30,8 +32,20 @@ const AuthenticatedHomeScreen = ({ onLogout }: AuthenticatedHomeScreenProps) => 
     onLogout();
   };
 
-  if (showGroups) {
-    return <GroupListScreen onLogout={handleLogout} onBack={() => setShowGroups(false)} />;
+  if (showCreateGroup) {
+    return (
+      <CreateGroupScreen
+        onBack={() => setShowCreateGroup(false)}
+        onViewGroups={() => {
+          setShowCreateGroup(false);
+          setShowViewGroups(true);
+        }}
+      />
+    );
+  }
+
+  if (showViewGroups) {
+    return <ViewGroupsScreen onBack={() => setShowViewGroups(false)} />;
   }
 
   if (showAcceptInvite) {
@@ -72,16 +86,24 @@ const AuthenticatedHomeScreen = ({ onLogout }: AuthenticatedHomeScreenProps) => 
 
         <View style={styles.actionsGrid}>
           <Pressable
-            testID="viewGroupsButton"
+            testID="createGroupHomeButton"
             style={[styles.button, styles.primaryButton]}
-            onPress={() => setShowGroups(true)}
+            onPress={() => setShowCreateGroup(true)}
+          >
+            <Text style={styles.buttonText}>Criar grupo</Text>
+          </Pressable>
+
+          <Pressable
+            testID="viewGroupsButton"
+            style={[styles.button, styles.secondaryButton]}
+            onPress={() => setShowViewGroups(true)}
           >
             <Text style={styles.buttonText}>Ver grupos</Text>
           </Pressable>
 
           <Pressable
             testID="acceptInviteButton"
-            style={[styles.button, styles.secondaryButton]}
+            style={[styles.button, styles.accentButton]}
             onPress={() => setShowAcceptInvite(true)}
           >
             <Text style={styles.buttonText}>Aceitar convite</Text>
@@ -179,6 +201,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
   },
   secondaryButton: {
+    backgroundColor: theme.colors.info,
+  },
+  accentButton: {
     backgroundColor: theme.colors.accent,
   },
   eventButton: {

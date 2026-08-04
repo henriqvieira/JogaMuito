@@ -49,7 +49,7 @@ export const createGroupFromHome = async (groupName?: string) => {
   const suffix = uniqueSuffix();
   const resolvedGroupName = groupName ?? `Grupo E2E ${suffix}`;
 
-  await element(by.id('viewGroupsButton')).tap();
+  await element(by.id('createGroupHomeButton')).tap();
   await expect(element(by.id('groupNameInput'))).toBeVisible();
 
   await element(by.id('groupNameInput')).replaceText(resolvedGroupName);
@@ -57,13 +57,18 @@ export const createGroupFromHome = async (groupName?: string) => {
   await element(by.id('createGroupButton')).tap();
   await dismissOkAlertIfVisible();
 
-  await waitFor(element(by.id('groupIdText')).atIndex(0))
+  await waitFor(element(by.id('goToViewGroupsButton')))
+    .toBeVisible()
+    .withTimeout(10000);
+  await element(by.id('goToViewGroupsButton')).tap();
+
+  await waitFor(element(by.id('groupInternalIdText')).atIndex(0))
     .toBeVisible()
     .withTimeout(10000);
 
-  const attrs = await element(by.id('groupIdText')).atIndex(0).getAttributes();
+  const attrs = await element(by.id('groupInternalIdText')).atIndex(0).getAttributes();
   const text = String((attrs as any).text ?? (attrs as any).label ?? '');
-  const groupIdMatch = text.match(/ID:\s*(.+)$/);
+  const groupIdMatch = text.match(/Referencia interna:\s*(.+)$/);
 
   if (!groupIdMatch?.[1]) {
     throw new Error(`Nao foi possivel obter o ID do grupo a partir de: "${text}"`);

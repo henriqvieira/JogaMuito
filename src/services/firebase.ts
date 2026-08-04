@@ -10,6 +10,7 @@ import {
   signInWithEmailAndPassword,
   signInWithCredential,
   signOut,
+  updateProfile,
 } from 'firebase/auth';
 import {
   FIREBASE_API_KEY,
@@ -61,8 +62,20 @@ export const loginWithEmailAndPassword = async (email: string, password: string)
   return signInWithEmailAndPassword(auth, email, password);
 };
 
-export const registerWithEmailAndPassword = async (email: string, password: string) => {
-  return createUserWithEmailAndPassword(auth, email, password);
+export const registerWithEmailAndPassword = async (
+  email: string,
+  password: string,
+  name?: string,
+) => {
+  const credential = await createUserWithEmailAndPassword(auth, email, password);
+
+  if (name?.trim()) {
+    await updateProfile(credential.user, {
+      displayName: name.trim(),
+    });
+  }
+
+  return credential;
 };
 
 export const signInWithSocialCredential = async (credential: AuthCredential) => {
