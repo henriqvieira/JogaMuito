@@ -13,6 +13,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { auth, db } from './firebase';
+import { FIRESTORE_COLLECTIONS, FIRESTORE_SUBCOLLECTIONS } from './firestoreSchema';
 
 export type GameGroup = {
   id: string;
@@ -33,8 +34,8 @@ export type VisibleGroups = {
   publicGroups: GameGroup[];
 };
 
-const groupsCollection = collection(db, 'groups');
-const invitesCollection = collection(db, 'groupInvites');
+const groupsCollection = collection(db, FIRESTORE_COLLECTIONS.groups);
+const invitesCollection = collection(db, FIRESTORE_COLLECTIONS.groupInvites);
 
 const toTitleCase = (value: string) =>
   value
@@ -233,7 +234,7 @@ export const acceptInviteWithCode = async (inviteText: string) => {
     groupId = invite.groupId;
   }
 
-  const groupRef = doc(db, 'groups', groupId);
+  const groupRef = doc(db, FIRESTORE_COLLECTIONS.groups, groupId);
   const groupSnapshot = await getDoc(groupRef);
   if (!groupSnapshot.exists()) {
     throw new Error('Grupo não encontrado.');
@@ -256,10 +257,10 @@ export const createGroupEvent = async (
   groupId: string,
   event: { title: string; description: string; date?: string },
 ) => {
-  const groupRef = doc(db, 'groups', groupId);
+  const groupRef = doc(db, FIRESTORE_COLLECTIONS.groups, groupId);
   await assertAdmin(groupRef);
 
-  const eventsCollection = collection(groupRef, 'events');
+  const eventsCollection = collection(groupRef, FIRESTORE_SUBCOLLECTIONS.events);
   return addDoc(eventsCollection, {
     ...event,
     createdBy: getCurrentUserId(),
@@ -271,13 +272,13 @@ export const updateGroupInfo = async (
   groupId: string,
   updates: { name?: string; description?: string; isPublic?: boolean },
 ) => {
-  const groupRef = doc(db, 'groups', groupId);
+  const groupRef = doc(db, FIRESTORE_COLLECTIONS.groups, groupId);
   await assertAdmin(groupRef);
   return updateDoc(groupRef, updates);
 };
 
 export const exemptPlayerPayment = async (groupId: string, playerId: string) => {
-  const groupRef = doc(db, 'groups', groupId);
+  const groupRef = doc(db, FIRESTORE_COLLECTIONS.groups, groupId);
   await assertAdmin(groupRef);
   return updateDoc(groupRef, {
     paymentExemptions: arrayUnion(playerId),
