@@ -146,7 +146,7 @@ export const isUserAdmin = (group: GameGroup) => {
   return !!userId && (group.admins ?? []).includes(userId);
 };
 
-const assertAdmin = async (groupRef: any) => {
+const assertAdmin = async (groupRef: ReturnType<typeof doc>) => {
   const userId = getCurrentUserId();
   if (!userId) {
     throw new Error('Autenticação necessária.');
@@ -358,7 +358,7 @@ export const exemptPlayerPayment = async (groupId: string, playerId: string) => 
   });
 };
 
-const mapGroupDoc = (docSnapshot: any): GameGroup => {
+const mapGroupDoc = (docSnapshot: { id: string; data: () => DocumentData }): GameGroup => {
   const data = docSnapshot.data() as DocumentData;
 
   return {
@@ -416,7 +416,9 @@ export const loadVisibleGroups = async (): Promise<VisibleGroups> => {
         ),
       ),
       publicGroups: sortGroups(
-        mergedGroups.filter((group) => group.isPublic && !group.members?.includes(currentUserId ?? '')),
+        mergedGroups.filter(
+          (group) => group.isPublic && !group.members?.includes(currentUserId ?? ''),
+        ),
       ),
     };
   } catch (error) {
