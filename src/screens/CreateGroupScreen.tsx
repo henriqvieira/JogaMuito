@@ -56,7 +56,9 @@ const CreateGroupScreen = ({ onBack, onViewGroups }: CreateGroupScreenProps) => 
         isPublic,
         ownerId,
         ownerName: getCurrentUserName(),
-        displayId: createdGroupRef.displayId ?? getGroupDisplayId({ id: createdGroupRef.id, groupNumber: createdGroupRef.groupNumber }),
+        displayId:
+          createdGroupRef.displayId ??
+          getGroupDisplayId({ id: createdGroupRef.id, groupNumber: createdGroupRef.groupNumber }),
         members: ownerId ? [ownerId] : [],
         admins: ownerId ? [ownerId] : [],
         paymentExemptions: [],
@@ -67,8 +69,9 @@ const CreateGroupScreen = ({ onBack, onViewGroups }: CreateGroupScreenProps) => 
       setDescription('');
       setIsPublic(true);
       Alert.alert('Grupo criado', 'O grupo foi salvo com sucesso.');
-    } catch (error: any) {
-      Alert.alert('Erro ao criar grupo', error.message ?? 'Tente novamente.');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Tente novamente.';
+      Alert.alert('Erro ao criar grupo', message);
     } finally {
       setLoading(false);
     }

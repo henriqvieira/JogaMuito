@@ -7,7 +7,7 @@ jest.mock('firebase/firestore', () => {
   return {
     addDoc: jest.fn(() => Promise.resolve({ id: 'group123' })),
     arrayUnion: jest.fn((value: string) => value),
-    collection: jest.fn(() => ({}) ),
+    collection: jest.fn(() => ({})),
     doc: jest.fn(() => ({ id: 'group123' })),
     getDoc: jest.fn(() => Promise.resolve({ exists: () => true, data: () => ({}) })),
     getDocs: jest.fn(() => Promise.resolve({ empty: true, docs: [] })),
@@ -108,7 +108,9 @@ describe('groupService', () => {
     });
 
     it('deve rejeitar a criação se o Firestore falhar na transação', async () => {
-      (firestore.runTransaction as jest.Mock).mockRejectedValueOnce(new Error('firestore unavailable'));
+      (firestore.runTransaction as jest.Mock).mockRejectedValueOnce(
+        new Error('firestore unavailable'),
+      );
 
       await expect(
         addGroup({
