@@ -1,9 +1,11 @@
 export const FIRESTORE_COLLECTIONS = {
+  users: 'users',
   groups: 'groups',
   groupInvites: 'groupInvites',
   gameEvents: 'gameEvents',
   groupMatchReports: 'groupMatchReports',
   matchCosts: 'matchCosts',
+  counters: 'counters',
 } as const;
 
 export const FIRESTORE_SUBCOLLECTIONS = {

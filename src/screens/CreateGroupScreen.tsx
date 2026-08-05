@@ -49,12 +49,14 @@ const CreateGroupScreen = ({ onBack, onViewGroups }: CreateGroupScreenProps) => 
 
       const newGroup: GameGroup = {
         id: createdGroupRef.id,
+        groupId: createdGroupRef.groupId ?? createdGroupRef.id,
+        groupNumber: createdGroupRef.groupNumber,
         name: name.trim(),
         description: description.trim(),
         isPublic,
         ownerId,
         ownerName: getCurrentUserName(),
-        displayId: getGroupDisplayId({ id: createdGroupRef.id }),
+        displayId: createdGroupRef.displayId ?? getGroupDisplayId({ id: createdGroupRef.id, groupNumber: createdGroupRef.groupNumber }),
         members: ownerId ? [ownerId] : [],
         admins: ownerId ? [ownerId] : [],
         paymentExemptions: [],
