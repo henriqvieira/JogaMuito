@@ -75,15 +75,19 @@ const GroupListScreen = ({ onLogout, onBack }: GroupListScreenProps) => {
         ownerId: getCurrentUserId(),
       });
 
+      const currentUserId = getCurrentUserId();
       const newGroup: GameGroup = {
         id: createdGroup.id,
+        groupId: createdGroup.groupId ?? createdGroup.id,
+        groupNumber: createdGroup.groupNumber,
         name: name.trim(),
         description: description.trim(),
         isPublic,
-        ownerId: getCurrentUserId(),
-        members: [getCurrentUserId()].filter(Boolean) as string[],
-        admins: [getCurrentUserId()].filter(Boolean) as string[],
+        ownerId: currentUserId,
+        members: [currentUserId].filter(Boolean) as string[],
+        admins: [currentUserId].filter(Boolean) as string[],
         paymentExemptions: [],
+        displayId: createdGroup.displayId,
       };
 
       setGroups((prev) => [newGroup, ...prev]);

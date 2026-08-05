@@ -7,7 +7,9 @@ import {
   getDoc,
   getDocs,
   query,
+  runTransaction,
   serverTimestamp,
+  setDoc,
   Timestamp,
   updateDoc,
   where,
@@ -17,6 +19,8 @@ import { FIRESTORE_COLLECTIONS, FIRESTORE_SUBCOLLECTIONS } from './firestoreSche
 
 export type GameGroup = {
   id: string;
+  groupId?: string | null;
+  groupNumber?: number | null;
   name: string;
   description: string;
   isPublic: boolean;
@@ -57,8 +61,20 @@ export const formatFriendlyGroupId = (groupId: string) => {
   return `GRP-${normalized.slice(0, 6)}`;
 };
 
-export const getGroupDisplayId = (group: Pick<GameGroup, 'id' | 'displayId'>) => {
-  return group.displayId?.trim() || formatFriendlyGroupId(group.id);
+export const formatFriendlyGroupNumber = (groupNumber: number | null | undefined) => {
+  if (typeof groupNumber !== 'number' || Number.isNaN(groupNumber)) {
+    return 'GRP-000001';
+  }
+
+  return `GRP-${String(groupNumber).padStart(6, '0')}`;
+};
+
+export const getGroupDisplayId = (group: Pick<GameGroup, 'id' | 'displayId' | 'groupNumber'>) => {
+  if (group.displayId?.trim()) {
+    return group.displayId.trim();
+  }
+
+  return formatFriendlyGroupNumber(group.groupNumber);
 };
 
 const generateInviteCode = () =>
@@ -96,7 +112,7 @@ const parseInviteValue = (inviteText: string) => {
   return { type: 'invite' as const, value: trimmed };
 };
 
-const getCurrentUserId = () => auth.currentUser?.uid ?? null;
+export const getCurrentUserId = () => auth.currentUser?.uid ?? null;
 
 export const getCurrentUserName = () => {
   const displayName = auth.currentUser?.displayName?.trim();
@@ -161,6 +177,32 @@ export const validateGroupData = (group: {
   }
 };
 
+const ensureUserProfile = async (userId: string | null) => {
+  if (!userId) {
+    throw new Error('Autenticação necessária para criar o grupo.');
+  }
+
+  const usersCollection = collection(db, FIRESTORE_COLLECTIONS.users);
+  const userRef = doc(usersCollection, userId);
+  const userSnapshot = await getDoc(userRef);
+
+  if (!userSnapshot.exists()) {
+    await setDoc(
+      userRef,
+      {
+        uid: userId,
+        name: getCurrentUserName(),
+        email: auth.currentUser?.email ?? null,
+        role: 'member',
+        createdAt: serverTimestamp(),
+      },
+      { merge: true },
+    );
+  }
+
+  return userRef;
+};
+
 export const addGroup = async (group: {
   name: string;
   description: string;
@@ -168,20 +210,51 @@ export const addGroup = async (group: {
   ownerId: string | null;
 }) => {
   validateGroupData(group);
-  const groupRef = await addDoc(groupsCollection, {
-    ...group,
+
+  const currentUserId = getCurrentUserId();
+  if (!currentUserId) {
+    throw new Error('Autenticação necessária para criar o grupo.');
+  }
+
+  await ensureUserProfile(currentUserId);
+
+  const groupNumber = await runTransaction(db, async (transaction) => {
+    const counterRef = doc(db, FIRESTORE_COLLECTIONS.counters, 'groups');
+    const counterSnapshot = await transaction.get(counterRef);
+    const currentValue = Number(counterSnapshot.data()?.nextGroupNumber ?? 1);
+
+    transaction.set(
+      counterRef,
+      {
+        nextGroupNumber: currentValue + 1,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true },
+    );
+
+    return currentValue;
+  });
+
+  const groupRef = doc(groupsCollection);
+  const displayId = formatFriendlyGroupNumber(groupNumber);
+
+  await setDoc(groupRef, {
+    groupId: groupRef.id,
+    groupNumber,
+    name: group.name.trim(),
+    description: group.description.trim(),
+    createdBy: currentUserId,
+    ownerId: currentUserId,
     ownerName: getCurrentUserName(),
-    members: group.ownerId ? [group.ownerId] : [],
-    admins: group.ownerId ? [group.ownerId] : [],
+    members: [currentUserId],
+    admins: [currentUserId],
+    isPublic: group.isPublic,
+    displayId,
     paymentExemptions: [],
     createdAt: serverTimestamp(),
   });
 
-  await updateDoc(groupRef, {
-    displayId: formatFriendlyGroupId(groupRef.id),
-  });
-
-  return groupRef;
+  return { id: groupRef.id, groupId: groupRef.id, groupNumber, displayId };
 };
 
 export const createGroupInvite = async (groupId: string) => {
@@ -289,13 +362,15 @@ const mapGroupDoc = (docSnapshot: any): GameGroup => {
   const data = docSnapshot.data() as DocumentData;
 
   return {
-    id: docSnapshot.id,
+    id: data.groupId ?? docSnapshot.id,
+    groupId: data.groupId ?? docSnapshot.id,
+    groupNumber: data.groupNumber ?? null,
     name: data.name ?? '',
     description: data.description ?? '',
     isPublic: data.isPublic ?? false,
-    ownerId: data.ownerId ?? null,
+    ownerId: data.createdBy ?? data.ownerId ?? null,
     ownerName: data.ownerName ?? null,
-    displayId: data.displayId ?? formatFriendlyGroupId(docSnapshot.id),
+    displayId: data.displayId ?? formatFriendlyGroupNumber(data.groupNumber ?? null),
     createdAt: data.createdAt ?? null,
     members: data.members ?? [],
     admins: data.admins ?? [],
@@ -314,23 +389,43 @@ const sortGroups = (groups: GameGroup[]) => {
 export const loadVisibleGroups = async (): Promise<VisibleGroups> => {
   const currentUserId = getCurrentUserId();
 
-  const [memberSnapshot, publicSnapshot] = await Promise.all([
-    currentUserId
-      ? getDocs(query(groupsCollection, where('members', 'array-contains', currentUserId)))
-      : Promise.resolve(null),
-    getDocs(query(groupsCollection, where('isPublic', '==', true))),
-  ]);
+  try {
+    const [memberSnapshot, publicSnapshot] = await Promise.all([
+      currentUserId
+        ? getDocs(query(groupsCollection, where('members', 'array-contains', currentUserId)))
+        : Promise.resolve(null),
+      getDocs(query(groupsCollection, where('isPublic', '==', true))),
+    ]);
 
-  const memberGroups = memberSnapshot ? memberSnapshot.docs.map(mapGroupDoc) : [];
-  const memberIds = new Set(memberGroups.map((group) => group.id));
-  const publicGroups = publicSnapshot.docs
-    .map(mapGroupDoc)
-    .filter((group) => !memberIds.has(group.id));
+    const memberGroups = memberSnapshot ? memberSnapshot.docs.map(mapGroupDoc) : [];
+    const memberIds = new Set(memberGroups.map((group) => group.id));
+    const publicGroups = publicSnapshot.docs
+      .map(mapGroupDoc)
+      .filter((group) => !memberIds.has(group.id));
 
-  return {
-    memberGroups: sortGroups(memberGroups),
-    publicGroups: sortGroups(publicGroups),
-  };
+    const mergedGroups = [...memberGroups, ...publicGroups].filter(
+      (group, index, allGroups) =>
+        allGroups.findIndex((candidate) => candidate.id === group.id) === index,
+    );
+
+    return {
+      memberGroups: sortGroups(
+        mergedGroups.filter(
+          (group) =>
+            group.ownerId === currentUserId || group.members?.includes(currentUserId ?? ''),
+        ),
+      ),
+      publicGroups: sortGroups(
+        mergedGroups.filter((group) => group.isPublic && !group.members?.includes(currentUserId ?? '')),
+      ),
+    };
+  } catch (error) {
+    console.warn('Não foi possível carregar grupos do Firestore.', error);
+    return {
+      memberGroups: [],
+      publicGroups: [],
+    };
+  }
 };
 
 export const subscribeToGroups = (
