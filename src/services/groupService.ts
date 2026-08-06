@@ -15,7 +15,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { auth, db } from './firebase';
-import { FIRESTORE_COLLECTIONS, FIRESTORE_SUBCOLLECTIONS } from './firestoreSchema';
+import { FIRESTORE_COLLECTIONS } from './firestoreSchema';
 
 export type GameGroup = {
   id: string;
@@ -333,7 +333,7 @@ export const createGroupEvent = async (
   const groupRef = doc(db, FIRESTORE_COLLECTIONS.groups, groupId);
   await assertAdmin(groupRef);
 
-  const eventsCollection = collection(groupRef, FIRESTORE_SUBCOLLECTIONS.events);
+  const eventsCollection = collection(groupRef, FIRESTORE_COLLECTIONS.events);
   return addDoc(eventsCollection, {
     ...event,
     createdBy: getCurrentUserId(),

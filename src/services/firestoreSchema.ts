@@ -2,14 +2,10 @@ export const FIRESTORE_COLLECTIONS = {
   users: 'users',
   groups: 'groups',
   groupInvites: 'groupInvites',
-  gameEvents: 'gameEvents',
+  events: 'events',
   groupMatchReports: 'groupMatchReports',
   matchCosts: 'matchCosts',
   counters: 'counters',
-} as const;
-
-export const FIRESTORE_SUBCOLLECTIONS = {
-  events: 'events',
 } as const;
 
 export type FirestoreCollectionName =
