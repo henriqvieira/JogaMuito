@@ -77,9 +77,6 @@ export const getGroupDisplayId = (group: Pick<GameGroup, 'id' | 'displayId' | 'g
   return formatFriendlyGroupNumber(group.groupNumber);
 };
 
-const generateInviteCode = () =>
-  Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
-
 const parseInviteValue = (inviteText: string) => {
   const trimmed = inviteText.trim();
   try {
@@ -255,18 +252,6 @@ export const addGroup = async (group: {
   });
 
   return { id: groupRef.id, groupId: groupRef.id, groupNumber, displayId };
-};
-
-export const createGroupInvite = async (groupId: string) => {
-  const code = generateInviteCode();
-  await addDoc(invitesCollection, {
-    groupId,
-    code,
-    valid: true,
-    createdAt: serverTimestamp(),
-  });
-
-  return `https://jogamuito.app/invite/${code}`;
 };
 
 const findInviteByCode = async (code: string) => {
@@ -457,5 +442,3 @@ export const subscribeToGroups = (
     isActive = false;
   };
 };
-
-export { getCurrentUserId };

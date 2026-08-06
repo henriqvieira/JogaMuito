@@ -76,39 +76,21 @@ const ViewGroupsScreen = ({ onBack }: ViewGroupsScreenProps) => {
   };
 
   const handleGenerateInvite = async (group: GameGroup) => {
-    if (!isUserAdmin(group)) {
-      Alert.alert('Permissao negada', 'Apenas administradores podem gerar convites.');
-      return;
-    }
-
     try {
-      const inviteUrl = await createGroupInvite(group.id);
-      setInviteLinks((prev) => ({ ...prev, [group.id]: inviteUrl }));
-      Alert.alert('Convite gerado', 'O link de convite foi criado com sucesso.');
-    } catch (error: any) {
-      Alert.alert('Erro ao gerar convite', error.message ?? 'Tente novamente.');
-    }
-  };
+      // Link direto para o grupo (público ou privado)
+      const inviteUrl = `https://jogamuito.app/grupo/${group.id}`;
 
-  const handleShareInvite = async (group: GameGroup) => {
-    if (!isUserAdmin(group)) {
-      return;
-    }
+      // Mensagem personalizada
+      const message = `Você foi convidado para participar do grupo "${group.name}" no JogaMuito! 🎉\n\nClique no link para entrar: ${inviteUrl}`;
 
-    try {
-      const inviteUrl = await createInviteLink(group);
+      // Abre opções de compartilhamento (WhatsApp, e-mail, etc.)
       await Share.open({
         title: 'Convite para o grupo',
-        message: `Junte-se ao grupo ${group.name} no JogaMuito! ${inviteUrl}`,
+        message,
         url: inviteUrl,
-        social: Share.Social.WHATSAPP,
       });
     } catch (error: any) {
-      if (error?.message?.includes('not installed')) {
-        Alert.alert('WhatsApp nao encontrado', 'Instale o WhatsApp para compartilhar o convite.');
-      } else if (error?.message !== 'User did not share') {
-        Alert.alert('Erro ao compartilhar', error.message ?? 'Tente novamente.');
-      }
+      Alert.alert('Erro ao compartilhar convite', error.message ?? 'Tente novamente.');
     }
   };
 
@@ -199,19 +181,13 @@ const ViewGroupsScreen = ({ onBack }: ViewGroupsScreenProps) => {
         </Text>
 
         {isAdmin ? (
-          <Text testID="groupInternalIdText" style={styles.groupMetaMuted}>
-            Referencia interna: {group.id}
-          </Text>
-        ) : null}
-
-        {isAdmin ? (
           <>
             <Pressable
               testID={`generateInviteButton-${group.id}`}
               style={[styles.button, styles.generateButton]}
               onPress={() => handleGenerateInvite(group)}
             >
-              <Text style={styles.buttonText}>Gerar convite</Text>
+              <Text style={styles.buttonText}>Compartilhar convite</Text>
             </Pressable>
 
             {inviteLinks[group.id] ? (
@@ -221,16 +197,6 @@ const ViewGroupsScreen = ({ onBack }: ViewGroupsScreenProps) => {
                 </Text>
               </View>
             ) : null}
-
-            <Pressable
-              testID={`shareGroupButton-${group.id}`}
-              style={[styles.button, styles.shareButton]}
-              onPress={() => handleShareInvite(group)}
-            >
-              <Text style={styles.buttonText}>
-                {group.isPublic ? 'Compartilhar link' : 'Compartilhar convite'}
-              </Text>
-            </Pressable>
 
             <View style={styles.adminActionsRow}>
               <Pressable
