@@ -84,7 +84,7 @@ export type ManualPlayerStatsInput = {
   goals: number;
 };
 
-const eventsCollection = collection(db, FIRESTORE_COLLECTIONS.gameEvents);
+const eventsCollection = collection(db, FIRESTORE_COLLECTIONS.events);
 
 const isValidDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value);
 const isValidTime = (value: string) => /^\d{2}:\d{2}$/.test(value);
@@ -205,7 +205,7 @@ export const createGameEvent = async (event: CreateGameEventInput) => {
 };
 
 export const getGameEventById = async (eventId: string) => {
-  const eventRef = doc(db, FIRESTORE_COLLECTIONS.gameEvents, eventId.trim());
+  const eventRef = doc(db, FIRESTORE_COLLECTIONS.events, eventId.trim());
   const snapshot = await getDoc(eventRef);
 
   if (!snapshot.exists()) {
@@ -523,7 +523,7 @@ export const updateEventLineup = async (
   eventId: string,
   lineup: { teamA: string[]; teamB: string[] },
 ) => {
-  const eventRef = doc(db, FIRESTORE_COLLECTIONS.gameEvents, eventId.trim());
+  const eventRef = doc(db, FIRESTORE_COLLECTIONS.events, eventId.trim());
   const eventSnapshot = await getDoc(eventRef);
 
   if (!eventSnapshot.exists()) {
@@ -575,7 +575,7 @@ export const registerEventGoal = async (
     throw new Error('Minuto do gol inválido.');
   }
 
-  const eventRef = doc(db, FIRESTORE_COLLECTIONS.gameEvents, eventId.trim());
+  const eventRef = doc(db, FIRESTORE_COLLECTIONS.events, eventId.trim());
 
   const eventSnapshot = await getDoc(eventRef);
   if (!eventSnapshot.exists()) {
